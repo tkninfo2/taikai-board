@@ -1,0 +1,1361 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>4ブロック大会ボード</title>
+<meta name="description" content="4ブロックの総当たり予選から決勝トーナメントまでを進行する大会運営ボード。">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1B3A6B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="大会ボード">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Oswald:wght@400;500;600;700&display=swap">
+<style>
+  /* ---- reset ---- */
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;overscroll-behavior-y:contain}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+  button{-webkit-tap-highlight-color:transparent}
+  :root{
+    --ground:#E9ECF3;
+    --surface:#FFFFFF;
+    --surface-2:#F3F5FA;
+    --ink:#111726;
+    --ink-2:#4B5568;
+    --ink-3:#7C879C;
+    --line:#D2D8E4;
+    --line-strong:#B4BDCD;
+    --brand:#1B3A6B;
+    --brand-fg:#FFFFFF;
+    --brand-soft:#DDE5F5;
+    --brand-line:#9DB2D6;
+    --gold:#8F6C05;
+    --gold-soft:#F8EAC1;
+    --gold-line:#D6AF3B;
+    --danger:#A0161D;
+    --danger-soft:#FBE2E3;
+    --danger-fg:#FFFFFF;
+    --win-bg:#1B3A6B;
+    --win-fg:#FFFFFF;
+    --lose-bg:#E3E7F0;
+    --lose-fg:#6C7789;
+    --shadow:0 1px 2px rgba(16,24,40,.05), 0 10px 26px -14px rgba(16,24,40,.22);
+    --deco-op:.06;
+    --radius:10px;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0B111C;
+      --surface:#141B2B;
+      --surface-2:#1B2436;
+      --ink:#E7ECF5;
+      --ink-2:#A8B3C7;
+      --ink-3:#75819A;
+      --line:#27314A;
+      --line-strong:#3B4763;
+      --brand:#8FB4EC;
+      --brand-fg:#0B111C;
+      --brand-soft:#1D2B46;
+      --brand-line:#3A5480;
+      --gold:#E6BF57;
+      --gold-soft:#31280F;
+      --gold-line:#876C1E;
+      --danger:#F0949A;
+      --danger-soft:#3B1418;
+      --danger-fg:#25090C;
+      --win-bg:#8FB4EC;
+      --win-fg:#0B111C;
+      --lose-bg:#212B41;
+      --lose-fg:#8492A9;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 30px -16px rgba(0,0,0,.7);
+    --deco-op:.10;
+      --deco-op:.10;
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0B111C;
+    --surface:#141B2B;
+    --surface-2:#1B2436;
+    --ink:#E7ECF5;
+    --ink-2:#A8B3C7;
+    --ink-3:#75819A;
+    --line:#27314A;
+    --line-strong:#3B4763;
+    --brand:#8FB4EC;
+    --brand-fg:#0B111C;
+    --brand-soft:#1D2B46;
+    --brand-line:#3A5480;
+    --gold:#E6BF57;
+    --gold-soft:#31280F;
+    --gold-line:#876C1E;
+    --danger:#F0949A;
+    --danger-soft:#3B1418;
+    --danger-fg:#25090C;
+    --win-bg:#8FB4EC;
+    --win-fg:#0B111C;
+    --lose-bg:#212B41;
+    --lose-fg:#8492A9;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 30px -16px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground);
+    color:var(--ink);
+    font-family:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+    -webkit-text-size-adjust:100%;
+  }
+  .app{font-size:15px}
+  .app.pres{font-size:19px}
+  @media (max-width:720px){ .app{font-size:14px} }
+
+  h1,h2,h3{margin:0;font-family:"Shippori Mincho B1","Hiragino Mincho ProN",serif;font-weight:800;text-wrap:balance}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:20;
+    display:flex;align-items:center;gap:1.25rem;
+    padding:.7rem 1.1rem;
+    background:var(--surface);
+    border-bottom:1px solid var(--line);
+  }
+  .brandmark{display:flex;align-items:baseline;gap:.6rem;flex:0 0 auto}
+  .brandmark h1{font-size:1.18em;letter-spacing:.02em}
+  .brandmark .sub{font-size:.72em;color:var(--ink-3);letter-spacing:.14em}
+  .meet-name{
+    font-family:"Shippori Mincho B1",serif;font-weight:700;font-size:1em;
+    color:var(--ink);background:transparent;border:none;border-bottom:1px dashed var(--line-strong);
+    padding:.15rem .2rem;min-width:8ch;max-width:22ch;
+  }
+  .meet-name:focus{outline:2px solid var(--brand);outline-offset:2px;border-radius:3px}
+
+  .stepper{display:flex;align-items:center;gap:.45rem;margin-inline:auto;flex-wrap:wrap}
+  .step{
+    display:flex;align-items:center;gap:.4rem;
+    font-size:.84em;color:var(--ink-3);
+    padding:.28rem .6rem;border-radius:999px;white-space:nowrap;
+  }
+  .step .n{
+    font-family:"Oswald",sans-serif;font-weight:600;font-size:.95em;
+    width:1.45em;height:1.45em;display:grid;place-items:center;border-radius:50%;
+    background:var(--lose-bg);color:var(--lose-fg);
+  }
+  .step.done{color:var(--ink-2)}
+  .step.done .n{background:var(--brand-soft);color:var(--brand)}
+  .step.now{background:var(--brand);color:var(--brand-fg);font-weight:700}
+  .step.now .n{background:rgba(255,255,255,.22);color:var(--brand-fg)}
+  :root[data-theme="dark"] .step.now .n{background:rgba(0,0,0,.25)}
+  .step-sep{color:var(--line-strong)}
+
+  .tools{display:flex;gap:.4rem;flex:0 0 auto}
+  @media (max-width:1060px){
+    .topbar{gap:.7rem}
+    .brandmark .sub{display:none}
+    .step{padding:.28rem .45rem;font-size:.8em}
+  }
+
+  /* ---------- buttons ---------- */
+  button{font-family:inherit;font-size:1em;cursor:pointer}
+  .btn{
+    display:inline-flex;align-items:center;gap:.4rem;
+    min-height:38px;padding:.4rem .9rem;border-radius:8px;
+    border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-2);
+    font-size:.88em;font-weight:500;
+  }
+  .btn:hover{background:var(--surface-2);color:var(--ink)}
+  .btn:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-fg);font-weight:700;font-size:.95em;min-height:46px;padding:.5rem 1.4rem}
+  .btn.primary:hover{background:var(--brand);filter:brightness(1.08)}
+  .btn.gold{background:var(--gold-soft);border-color:var(--gold-line);color:var(--gold);font-weight:700}
+  .btn[disabled]{opacity:.45;cursor:not-allowed}
+  .btn.quiet{border-color:transparent;background:transparent}
+  .btn.quiet:hover{background:var(--surface-2)}
+
+  /* ---------- shell ---------- */
+  main{padding:1.1rem 1.1rem 5.5rem}
+  .wrap-narrow{max-width:62rem;margin:0 auto}
+
+  /* ---------- setup ---------- */
+  .setup-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:1.1rem;align-items:start}
+  @media (max-width:860px){.setup-grid{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .panel-hd{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.85rem 1rem;border-bottom:1px solid var(--line)}
+  .panel-hd h2{font-size:1.05em}
+  .panel-bd{padding:1rem}
+  .eyebrow{font-size:.72em;letter-spacing:.16em;color:var(--ink-3);font-weight:700}
+
+  textarea.teams{
+    width:100%;min-height:17rem;resize:vertical;
+    font-family:"Zen Kaku Gothic New",sans-serif;font-size:1em;line-height:1.9;
+    padding:.7rem .8rem;border:1px solid var(--line-strong);border-radius:8px;
+    background:var(--surface-2);color:var(--ink);
+  }
+  textarea.teams:focus{outline:2px solid var(--brand);outline-offset:1px;background:var(--surface)}
+  .field-note{font-size:.82em;color:var(--ink-3);margin-top:.5rem;line-height:1.7}
+  .seed-note{
+    display:flex;gap:.5rem;align-items:flex-start;
+    font-size:.82em;line-height:1.7;color:var(--gold);
+    background:var(--gold-soft);border:1px solid var(--gold-line);border-radius:8px;
+    padding:.55rem .7rem;margin-bottom:.75rem;
+  }
+
+  .count-row{display:flex;align-items:baseline;gap:.5rem;margin-bottom:.9rem}
+  .count-big{font-family:"Oswald",sans-serif;font-weight:600;font-size:2.6em;line-height:1;color:var(--brand)}
+  .count-unit{font-size:.9em;color:var(--ink-2)}
+  .split-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;margin-bottom:.9rem}
+  .split-cell{
+    text-align:center;padding:.6rem .3rem;border-radius:8px;
+    background:var(--surface-2);border:1px solid var(--line);
+  }
+  .split-cell .bl{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:1em;color:var(--ink-2)}
+  .split-cell .num{font-family:"Oswald",sans-serif;font-size:1.5em;font-weight:600;color:var(--ink);line-height:1.2}
+  .split-cell .unit{font-size:.68em;color:var(--ink-3)}
+  .alert{
+    font-size:.85em;line-height:1.7;padding:.6rem .75rem;border-radius:8px;
+    background:var(--danger-soft);border:1px solid var(--danger);color:var(--danger);
+  }
+  .rules-list{list-style:none;margin:0;padding:0;display:grid;gap:.55rem;font-size:.85em;color:var(--ink-2);line-height:1.65}
+  .rules-list li{display:grid;grid-template-columns:5.5rem 1fr;gap:.6rem}
+  .rules-list dt,.rules-list .k{color:var(--ink-3);font-size:.92em}
+
+  /* ---------- qualifying ---------- */
+  .blocks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+  @media (max-width:900px){.blocks{grid-template-columns:1fr}}
+  .block{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column}
+  .block-hd{display:flex;align-items:center;gap:.7rem;padding:.7rem .9rem;border-bottom:1px solid var(--line)}
+  .block-letter{
+    font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:1.35em;line-height:1;
+    color:var(--brand-fg);background:var(--brand);
+    width:1.9em;height:1.9em;display:grid;place-items:center;border-radius:7px;
+  }
+  .block-hd h2{font-size:1em;letter-spacing:.04em}
+  .prog{margin-left:auto;font-size:.8em;color:var(--ink-3);display:flex;align-items:center;gap:.4rem}
+  .prog b{font-family:"Oswald",sans-serif;font-weight:600;font-size:1.15em;color:var(--ink-2)}
+  .prog.full b{color:var(--brand)}
+
+  table.rr{width:100%;border-collapse:collapse;font-size:.86em}
+  .rr-scroll{overflow-x:auto}
+  table.rr th,table.rr td{border-bottom:1px solid var(--line);padding:.42rem .35rem;text-align:center;white-space:nowrap}
+  table.rr thead th{font-size:.86em;font-weight:700;color:var(--ink-3);background:var(--surface-2);letter-spacing:.04em}
+  table.rr th.tm{text-align:left;padding-left:.7rem;min-width:7rem}
+  table.rr td.tm{text-align:left;padding-left:.7rem;font-weight:500}
+  table.rr td.tm .idx{font-family:"Oswald",sans-serif;color:var(--ink-3);margin-right:.4rem;font-size:.9em}
+  .num{font-family:"Oswald",sans-serif;font-variant-numeric:tabular-nums;font-weight:500}
+  td.cell-self{background:var(--surface-2);color:var(--line-strong)}
+  td.cell-none{color:var(--ink-3)}
+  .mk{font-weight:700;margin-right:.15rem}
+  .mk.w{color:var(--brand)}
+  .mk.l{color:var(--ink-3)}
+  td.dif{color:var(--ink-2)}
+  tr.first td{background:var(--gold-soft)}
+  tr.first td.tm{font-weight:700}
+  td.rank{font-family:"Oswald",sans-serif;font-weight:600}
+  tr.first td.rank{color:var(--gold)}
+  .thru{
+    display:inline-block;font-size:.72em;font-weight:700;letter-spacing:.06em;
+    background:var(--gold-line);color:#20180a;border-radius:4px;padding:.05rem .3rem;margin-left:.35rem;
+  }
+  :root[data-theme="dark"] .thru{color:#1a1408}
+
+  .matches{display:flex;flex-direction:column;padding:.35rem .5rem .6rem}
+  .match{
+    display:grid;
+    grid-template-columns:4.6rem minmax(0,1fr) 3.5rem .8rem 3.5rem minmax(0,1fr);
+    align-items:center;gap:.35rem;
+    padding:.3rem .35rem;border-radius:7px;
+  }
+  .match + .match{border-top:1px solid var(--line)}
+  .match.err{background:var(--danger-soft)}
+  .mno{font-size:.78em;color:var(--ink-3);letter-spacing:.03em}
+  .side{display:flex;align-items:center;gap:.35rem;min-width:0}
+  .side.l{justify-content:flex-end;text-align:right}
+  .side.r{justify-content:flex-start}
+  .tname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.94em}
+  .side.won .tname{font-weight:700}
+  .side.lost .tname{color:var(--ink-3)}
+  .wl{
+    font-size:.7em;font-weight:700;border-radius:4px;padding:.08rem .28rem;flex:0 0 auto;
+    background:var(--lose-bg);color:var(--lose-fg);
+  }
+  .side.won .wl{background:var(--win-bg);color:var(--win-fg)}
+  input.score{
+    width:100%;min-height:40px;text-align:center;
+    font-family:"Oswald",sans-serif;font-variant-numeric:tabular-nums;font-size:1.15em;font-weight:600;
+    border:1px solid var(--line-strong);border-radius:7px;
+    background:var(--surface-2);color:var(--ink);padding:0;
+  }
+  input.score:focus{outline:2px solid var(--brand);outline-offset:1px;background:var(--surface)}
+  input.score::placeholder{color:var(--line-strong);font-weight:400}
+  .dash{text-align:center;color:var(--ink-3)}
+
+  .tiebreak{
+    display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;
+    margin:.1rem .6rem .7rem;padding:.55rem .7rem;border-radius:8px;
+    background:var(--gold-soft);border:1px solid var(--gold-line);
+    font-size:.83em;color:var(--gold);line-height:1.6;
+  }
+  .tiebreak select{
+    font-family:inherit;font-size:1em;padding:.3rem .4rem;min-height:34px;
+    border:1px solid var(--gold-line);border-radius:6px;background:var(--surface);color:var(--ink);
+  }
+
+  /* ---------- bracket ---------- */
+  .bracket{
+    display:grid;grid-template-columns:minmax(13rem,1fr) minmax(13rem,1fr) minmax(11rem,.85fr);
+    gap:0 2.6rem;align-items:center;
+    max-width:58rem;margin:1.4rem auto 0;
+  }
+  @media (max-width:800px){.bracket{grid-template-columns:1fr;gap:1rem}}
+  .col-hd{
+    grid-row:1;font-size:.74em;letter-spacing:.18em;color:var(--ink-3);font-weight:700;
+    text-align:center;padding-bottom:.5rem;
+  }
+  .semis{grid-column:1;grid-row:2;display:flex;flex-direction:column;gap:2.2rem;position:relative}
+  .finalslot{grid-column:2;grid-row:2;position:relative}
+  .champslot{grid-column:3;grid-row:2}
+
+  .tie{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden;
+  }
+  .tie-hd{
+    font-size:.75em;letter-spacing:.1em;color:var(--ink-3);font-weight:700;
+    padding:.35rem .7rem;border-bottom:1px solid var(--line);background:var(--surface-2);
+  }
+  .tie-row{display:grid;grid-template-columns:minmax(0,1fr) 3.8rem;align-items:center;gap:.5rem;padding:.45rem .7rem}
+  .tie-row + .tie-row{border-top:1px solid var(--line)}
+  .tie-row .tname{font-size:1em}
+  .tie-row.won{background:var(--brand-soft)}
+  .tie-row.won .tname{font-weight:700;color:var(--ink)}
+  .tie-row.lost .tname{color:var(--ink-3)}
+  .tie-row .seedmark{font-size:.72em;color:var(--ink-3);margin-right:.35rem;font-family:"Oswald",sans-serif}
+  .tie.pending .tie-row .tname{color:var(--ink-3);font-style:normal}
+
+  .champ{
+    text-align:center;padding:1.1rem .9rem;border-radius:var(--radius);
+    background:var(--gold-soft);border:1px solid var(--gold-line);box-shadow:var(--shadow);
+  }
+  .champ .lbl{font-size:.74em;letter-spacing:.28em;color:var(--gold);font-weight:700}
+  .champ .nm{
+    font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:1.6em;line-height:1.35;
+    margin-top:.3rem;color:var(--ink);word-break:break-word;
+  }
+  .champ.empty{background:var(--surface-2);border-style:dashed;border-color:var(--line-strong)}
+  .champ.empty .lbl{color:var(--ink-3)}
+  .champ.empty .nm{color:var(--ink-3);font-size:1.1em;font-weight:700}
+
+  /* connectors */
+  @media (min-width:801px){
+    .semis::after,.finalslot::before{content:"";position:absolute;pointer-events:none}
+    .semis::after{
+      right:-1.3rem;top:25%;bottom:25%;width:1.3rem;
+      border:1px solid var(--line-strong);border-left:none;border-radius:0 6px 6px 0;
+    }
+    .finalslot::before{
+      left:-1.3rem;top:50%;width:1.3rem;border-top:1px solid var(--line-strong);
+    }
+    .finalslot::after{
+      content:"";position:absolute;right:-2.6rem;top:50%;width:2.6rem;
+      border-top:1px solid var(--line-strong);pointer-events:none;
+    }
+  }
+
+  .draw-cta{text-align:center;margin:2.4rem auto;max-width:32rem}
+  .draw-cta p{color:var(--ink-2);font-size:.9em;line-height:1.8;margin:0 0 1rem}
+  .seedlist{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;margin-bottom:1.2rem}
+  .seedchip{
+    font-size:.85em;padding:.3rem .65rem;border-radius:999px;
+    background:var(--brand-soft);border:1px solid var(--brand-line);color:var(--ink);
+  }
+  .seedchip b{font-family:"Shippori Mincho B1",serif;margin-right:.3rem;color:var(--brand)}
+
+  /* ---------- action bar ---------- */
+  .actionbar{
+    position:fixed;left:0;right:0;bottom:0;z-index:15;
+    display:flex;align-items:center;gap:.75rem;
+    padding:.65rem 1.1rem;
+    padding-bottom:calc(.65rem + env(safe-area-inset-bottom));
+    background:var(--surface);border-top:1px solid var(--line);
+    box-shadow:0 -8px 24px -18px rgba(16,24,40,.5);
+  }
+  .actionbar .msg{font-size:.85em;color:var(--ink-2);line-height:1.6}
+  .actionbar .msg b{color:var(--ink)}
+  .actionbar .right{margin-left:auto;display:flex;gap:.6rem;align-items:center}
+  .app.pres .actionbar,.app.pres .tools .hide-pres,.app.pres .setup-only{display:none}
+  .app.pres main{padding-bottom:1.5rem}
+  .app.pres input.score{border-color:transparent;background:transparent;pointer-events:none;font-size:1.3em}
+  .app.pres .meet-name{border-bottom-color:transparent}
+
+  /* 大画面表示：予選は星取表4つだけを見せ、対戦カードの入力欄は隠す */
+  .app.pres .matches{display:none}
+  .app.pres .tiebreak select{display:none}
+  .app.pres table.rr{font-size:.92em}
+  .app.pres table.rr th,.app.pres table.rr td{padding:.46rem .32rem}
+  .app.pres table.rr th.tm{min-width:6rem}
+  .app.pres table.rr .col-gf,.app.pres table.rr .col-ga{display:none}
+  .app.pres .block-hd{padding:.55rem .9rem}
+  .app.pres .blocks{gap:.85rem}
+  @media (min-width:640px){
+    .app.pres .blocks{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+
+  /* ---------- confirm dialog ---------- */
+  .overlay{
+    position:fixed;inset:0;z-index:60;
+    display:grid;place-items:center;padding:1.2rem;
+    background:rgba(10,15,26,.55);
+  }
+  .dialog{
+    width:min(26rem,100%);
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:0 24px 60px -20px rgba(10,15,26,.7);
+    padding:1.15rem 1.25rem 1rem;
+  }
+  .dialog h2{font-size:1.1em;margin-bottom:.5rem}
+  .dialog p{margin:0;font-size:.88em;line-height:1.8;color:var(--ink-2)}
+  .dlg-rows{display:grid;gap:.5rem;margin-top:1rem}
+  .dlg-rows .btn{justify-content:center;min-height:46px;font-size:.92em}
+  .dlg-warn{font-size:.79em;color:var(--ink-3);line-height:1.75;margin-top:.9rem}
+  .dlg-actions{display:flex;justify-content:flex-end;gap:.6rem;margin-top:1.1rem}
+  .dlg-actions .btn{min-height:42px}
+  .dlg-actions .btn.primary{min-height:42px;padding:.5rem 1.1rem;font-size:.9em}
+  .dlg-actions .btn.warn{background:var(--danger);border-color:var(--danger);color:var(--danger-fg);font-weight:700}
+
+  /* ---------- offline / standalone ---------- */
+  .offline-note{
+    display:none;align-items:center;gap:.4rem;
+    font-size:.78em;color:var(--ink-3);
+  }
+  body.is-offline .offline-note{display:inline-flex}
+  .offline-note .dot{width:.5em;height:.5em;border-radius:50%;background:var(--ink-3)}
+
+  /* ---------- ダーツの装飾 ---------- */
+  /* 画面の隅に置く背景の飾り。読むものの邪魔をしないよう、うんと薄く敷く。 */
+  .deco{position:fixed;pointer-events:none;z-index:0;user-select:none}
+  .deco svg{display:block;width:100%;height:100%}
+  .deco-board{right:-7.5rem;bottom:-7.5rem;width:28rem;height:28rem;opacity:var(--deco-op)}
+  .deco-dart{left:-2.5rem;bottom:.5rem;width:15rem;height:15rem;opacity:calc(var(--deco-op) * .85)}
+  /* 装飾は z-index:0。本文だけ重ね順を持たせる
+     （.topbar は sticky / .actionbar は fixed で既に z-index を持つので触らない） */
+  main{position:relative;z-index:1}
+
+  /* ブランドマークの小さなダーツ盤 */
+  .brand-board{width:1.55em;height:1.55em;flex:0 0 auto}
+
+  /* 決勝の勝者カードに立つダーツ */
+  .champ-dart{width:2.6em;height:2.6em;margin:0 auto .15rem;color:var(--gold)}
+
+  /* ---------- ロゴ画像 ---------- */
+  /* 元画像は円の外側が白い。実測で円は枠の 98.5% を占めるので、
+     半径 49% で切り抜くと白い余白だけがきれいに消える。 */
+  .logo{
+    display:block;border-radius:50%;
+    clip-path:circle(49% at 50% 50%);
+    -webkit-clip-path:circle(49% at 50% 50%);
+  }
+  .logo-mark{width:2.35em;height:2.35em;flex:0 0 auto}
+  .logo-slot[hidden]{display:none}
+
+  /* ---------- 表紙（大画面モード） ---------- */
+  .cover{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:1.4rem;text-align:center;
+    min-height:calc(100vh - 8rem);padding:1rem 1rem 2rem;
+  }
+  .cover .logo{
+    width:min(52vh,42rem);height:min(52vh,42rem);
+    box-shadow:0 30px 70px -30px rgba(10,15,26,.55);
+  }
+  .cover-eyebrow{font-size:.8em;letter-spacing:.34em;color:var(--gold);font-weight:700}
+  .cover h2{
+    font-family:"Shippori Mincho B1",serif;font-weight:800;
+    font-size:2.1em;line-height:1.4;margin-top:.35rem;
+  }
+  .cover-noimg{
+    display:grid;place-items:center;gap:.6rem;
+    width:min(52vh,42rem);aspect-ratio:1;border-radius:50%;
+    border:2px dashed var(--line-strong);color:var(--ink-3);
+    font-size:.95em;line-height:1.9;padding:2rem;
+  }
+
+  /* ---------- 決勝画面の一言 ---------- */
+  .thanks{
+    display:flex;flex-direction:column;align-items:center;gap:.7rem;
+    margin:2.8rem auto 0;max-width:34rem;text-align:center;
+  }
+  .thanks .rule{width:5.5rem;height:1px;background:var(--gold-line);opacity:.7}
+  .thanks p{
+    margin:0;font-family:"Shippori Mincho B1",serif;font-weight:700;
+    font-size:1.05em;letter-spacing:.12em;line-height:1.9;
+    color:var(--ink-3);
+  }
+  .app.pres .thanks{margin-top:2rem}
+  .app.pres .thanks p{font-size:1.15em;color:var(--gold)}
+
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="deco deco-board" id="decoBoard" aria-hidden="true"></div>
+<div class="deco deco-dart" id="decoDart" aria-hidden="true"></div>
+
+<div class="app" id="app">
+  <header class="topbar">
+    <div class="brandmark">
+      <span class="logo-slot" id="logoSlot"><img class="logo logo-mark" id="logoMark" alt="ツバサ ありがと会"></span>
+      <h1>大会ボード</h1>
+      <span class="sub">DARTS</span>
+      <input class="meet-name" id="meetName" aria-label="大会名" placeholder="大会名">
+    </div>
+    <nav class="stepper" id="stepper" aria-label="進行"></nav>
+    <div class="tools">
+      <span class="offline-note hide-pres" title="通信なしで動作中"><span class="dot"></span>オフライン</span>
+      <button class="btn quiet" id="btnCover">◎ 表紙</button>
+      <button class="btn quiet hide-pres" id="btnData">⤓ データ</button>
+      <button class="btn quiet hide-pres" id="btnTheme" title="表示テーマ切替">◐ テーマ</button>
+      <button class="btn" id="btnPres">▣ 大画面表示</button>
+      <button class="btn quiet hide-pres" id="btnReset">最初から</button>
+    </div>
+  </header>
+  <main id="view"></main>
+  <div id="bar"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "block4-board-v1";
+  var LETTERS = ["A","B","C","D"];
+  var CIRCLED = ["①","②","③","④","⑤","⑥"];
+  var MIN_TEAMS = 8, MAX_TEAMS = 16;
+
+  /* ロゴ画像。PWA版は同じフォルダの logo.png を読む。
+     ファイルが無いときは表示枠ごと自動的に隠れる。 */
+  var LOGO_SRC = "logo.jpg";
+
+  var THANKS = "ツバサ　お疲れさま＆ありがとう！";
+
+  /* 初期値：♠️／♦️／❤️ の組で13チーム */
+  var SAMPLE = (function(){
+    var out=[];
+    for(var i=1;i<=13;i++) out.push("♠️"+i+"／♦️"+i+"／❤️"+i);
+    return out;
+  })();
+
+  var state = load() || {
+    phase:"setup",
+    meetName:"ツバサ ありがと会",
+    raw:SAMPLE.join("\n"),
+    seeded:true,
+    teams:[], blocks:[], final:null,
+    pres:false, cover:false
+  };
+
+  /* ---------- storage ---------- */
+  function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+  }
+  function load(){
+    try{
+      var s = localStorage.getItem(KEY);
+      if(!s) return null;
+      var o = JSON.parse(s);
+      return (o && o.phase) ? o : null;
+    }catch(e){ return null; }
+  }
+
+  /* ---------- helpers ---------- */
+  function parseTeams(raw){
+    return String(raw||"").split("\n")
+      .map(function(s){ return s.replace(/\s+$/,"").replace(/^\s+/,""); })
+      .filter(function(s){ return s.length>0; });
+  }
+  function splitSizes(n){
+    var base = Math.floor(n/4), rem = n%4, out=[];
+    for(var i=0;i<4;i++) out.push(base + (i<rem?1:0));
+    return out;
+  }
+  function shuffle(a){
+    var arr=a.slice();
+    for(var i=arr.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1)), t=arr[i]; arr[i]=arr[j]; arr[j]=t;
+    }
+    return arr;
+  }
+  function roundRobin(ids){
+    var list = ids.slice();
+    if(list.length%2) list.push(null);
+    var n=list.length, out=[];
+    for(var r=0;r<n-1;r++){
+      for(var i=0;i<n/2;i++){
+        var a=list[i], b=list[n-1-i];
+        if(a!=null && b!=null) out.push(r%2 ? {a:b,b:a} : {a:a,b:b});
+      }
+      list = [list[0]].concat([list[n-1]], list.slice(1,n-1));
+    }
+    return out;
+  }
+  function teamName(id){
+    var t = state.teams.filter(function(x){return x.id===id;})[0];
+    return t ? t.name : "—";
+  }
+  function esc(s){
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  /* window.confirm is blocked inside the sandboxed frame, so ask in-page */
+  function ask(opts, onOk){
+    var prev = document.activeElement;
+    var ov = document.createElement("div");
+    ov.className = "overlay";
+    ov.innerHTML =
+      '<div class="dialog" role="dialog" aria-modal="true" aria-label="'+esc(opts.title)+'">'
+      + '<h2>'+esc(opts.title)+'</h2><p>'+esc(opts.body)+'</p>'
+      + '<div class="dlg-actions">'
+        + (opts.noCancel ? '' : '<button class="btn" data-x="no">キャンセル</button>')
+        + '<button class="btn '+(opts.danger?"warn":"primary")+'" data-x="yes">'+esc(opts.ok)+'</button>'
+      + '</div></div>';
+    document.body.appendChild(ov);
+
+    function close(){
+      document.removeEventListener("keydown", onKey);
+      if(ov.parentNode) ov.parentNode.removeChild(ov);
+      if(prev && prev.focus) try{ prev.focus(); }catch(e){}
+    }
+    function onKey(e){ if(e.key==="Escape"){ e.preventDefault(); close(); } }
+    document.addEventListener("keydown", onKey);
+
+    ov.addEventListener("click", function(e){
+      if(e.target===ov){ close(); return; }
+      var btn = e.target.closest ? e.target.closest("[data-x]") : null;
+      if(!btn) return;
+      var yes = btn.getAttribute("data-x")==="yes";
+      close();
+      if(yes) onOk();
+    });
+
+    var okBtn = ov.querySelector('[data-x="yes"]');
+    if(okBtn) okBtn.focus();
+  }
+
+  function note(title, body){ ask({title:title, body:body, ok:"OK", noCancel:true}, function(){}); }
+
+  /* ---------- ダーツのイラスト ---------- */
+  /* 20分割のダーツ盤。色は配色トークンから取るので、明暗どちらのテーマでも成立する。 */
+  function dartboardSVG(){
+    var rOut=49, rDblIn=43, rTrpOut=30, rTrpIn=25.5, rInner=8.5, rBull=4;
+    function pt(r,deg){
+      var a=(deg-90)*Math.PI/180;
+      return (50+r*Math.cos(a)).toFixed(2)+" "+(50+r*Math.sin(a)).toFixed(2);
+    }
+    function sector(r1,r2,a1,a2,fill){
+      return '<path d="M'+pt(r2,a1)+' A'+r2+' '+r2+' 0 0 1 '+pt(r2,a2)
+           + ' L'+pt(r1,a2)+' A'+r1+' '+r1+' 0 0 0 '+pt(r1,a1)+' Z" fill="'+fill+'"/>';
+    }
+    var svg='<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">';
+    for(var i=0;i<20;i++){
+      var a1=i*18-9, a2=a1+18, even=(i%2===0);
+      var single = even ? "var(--brand)" : "var(--brand-soft)";
+      var ring   = even ? "var(--gold-line)" : "var(--gold)";
+      svg += sector(rTrpOut, rDblIn,  a1, a2, single);
+      svg += sector(rInner,  rTrpIn,  a1, a2, single);
+      svg += sector(rDblIn,  rOut,    a1, a2, ring);
+      svg += sector(rTrpIn,  rTrpOut, a1, a2, ring);
+    }
+    svg += '<circle cx="50" cy="50" r="'+rInner+'" fill="var(--brand)"/>';
+    svg += '<circle cx="50" cy="50" r="'+rBull+'" fill="var(--gold)"/>';
+    svg += '<circle cx="50" cy="50" r="'+rOut+'" fill="none" stroke="var(--ink-3)" stroke-width="1.1"/>';
+    return svg+'</svg>';
+  }
+
+  /* ダーツ（矢）。body=バレル、flight=フライトの色 */
+  function dartSVG(body, flight, flightHi, angle){
+    return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
+      + '<g transform="rotate('+(angle==null?-38:angle)+' 50 50)">'
+      + '<polygon points="3,50 20,47.2 20,52.8" fill="'+body+'"/>'
+      + '<rect x="19" y="45.4" width="28" height="9.2" rx="4" fill="'+body+'"/>'
+      + '<rect x="46" y="48" width="20" height="4" fill="'+body+'"/>'
+      + '<polygon points="64,50 96,35.5 96,64.5" fill="'+flight+'"/>'
+      + '<polygon points="64,50 96,43.5 96,56.5" fill="'+flightHi+'"/>'
+      + '</g></svg>';
+  }
+
+  /* ---------- ロゴ画像 ---------- */
+  /* 画像が用意されていない場合は枠ごと消える（表紙では代わりの案内を出す） */
+  function wireLogos(){
+    [].slice.call(document.querySelectorAll("img.logo")).forEach(function(img){
+      if(img.__wired) return;
+      img.__wired = true;
+      img.addEventListener("error", function(){
+        var slot=img.parentNode;
+        if(slot && slot.classList && slot.classList.contains("logo-slot")){
+          slot.hidden=true;
+          if(slot.classList.contains("cover-logo")){
+            var alt=document.querySelector(".cover-noimg");
+            if(alt) alt.hidden=false;
+          }
+        } else { img.hidden=true; }
+      });
+      if(img.getAttribute("src")!==LOGO_SRC) img.setAttribute("src", LOGO_SRC);
+    });
+  }
+
+  /* ---------- backup / restore ---------- */
+  function pad2(n){ return (n<10?"0":"")+n; }
+  function exportFile(){
+    var payload = JSON.stringify({
+      app:"block4-board", version:1, savedAt:new Date().toISOString(), state:state
+    }, null, 2);
+    var d=new Date();
+    var name = "大会ボード-" + d.getFullYear() + pad2(d.getMonth()+1) + pad2(d.getDate())
+             + "-" + pad2(d.getHours()) + pad2(d.getMinutes()) + ".json";
+    var url = URL.createObjectURL(new Blob([payload], {type:"application/json"}));
+    var a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){
+      if(a.parentNode) a.parentNode.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 800);
+  }
+  function importFile(file){
+    var fr = new FileReader();
+    fr.onload = function(){
+      var st;
+      try{
+        var o = JSON.parse(fr.result);
+        st = (o && o.state) ? o.state : o;
+      }catch(e){ st = null; }
+      if(!st || !st.phase){
+        note("読み込めませんでした","このファイルは大会ボードの書き出しファイルではないようです。「ファイルに書き出す」で保存した .json を選んでください。");
+        return;
+      }
+      state = st;
+      if(!state.blocks) state.blocks = [];
+      if(!state.teams) state.teams = [];
+      if(typeof state.raw !== "string") state.raw = "";
+      state.pres = false;
+      save(); render(); window.scrollTo(0,0);
+      note("読み込みました","保存されていた進行状況に切り替えました。");
+    };
+    fr.onerror = function(){ note("読み込めませんでした","ファイルの読み取りに失敗しました。もう一度お試しください。"); };
+    fr.readAsText(file);
+  }
+  function dataDialog(){
+    var prev = document.activeElement;
+    var labels = {setup:"チーム登録", qualifying:"予選", final:"決勝トーナメント"};
+    var teamCount = parseTeams(state.raw).length;
+    var ov = document.createElement("div");
+    ov.className = "overlay";
+    ov.innerHTML =
+      '<div class="dialog" role="dialog" aria-modal="true" aria-label="データの保存と復元">'
+      + '<h2>データの保存と復元</h2>'
+      + '<p>いまの進行状況（' + esc(labels[state.phase]) + '／' + teamCount + 'チーム）をファイルとして保存できます。'
+      + '別の iPad やパソコンに引き継ぐときにも使えます。</p>'
+      + '<div class="dlg-rows">'
+        + '<button class="btn" data-x="exp">⤓ ファイルに書き出す</button>'
+        + '<button class="btn" data-x="imp">⤒ ファイルから読み込む</button>'
+      + '</div>'
+      + '<p class="dlg-warn">入力内容はこの端末のブラウザ内に自動保存されます。ただし Safari の履歴やWebサイトデータを削除すると失われるため、予選終了時など区切りごとに書き出しておくと安全です。</p>'
+      + '<div class="dlg-actions"><button class="btn primary" data-x="close">閉じる</button></div>'
+      + '<input type="file" accept=".json,application/json" hidden>'
+      + '</div>';
+    document.body.appendChild(ov);
+
+    var picker = ov.querySelector('input[type="file"]');
+    function close(){
+      document.removeEventListener("keydown", onKey);
+      if(ov.parentNode) ov.parentNode.removeChild(ov);
+      if(prev && prev.focus) try{ prev.focus(); }catch(e){}
+    }
+    function onKey(e){ if(e.key==="Escape"){ e.preventDefault(); close(); } }
+    document.addEventListener("keydown", onKey);
+
+    picker.addEventListener("change", function(){
+      var f = picker.files && picker.files[0];
+      if(!f) return;
+      close();
+      ask({
+        title:"ファイルから読み込む",
+        body:"いま入力されている内容はすべて上書きされます。先に書き出しておかないと元に戻せません。",
+        ok:"読み込む", danger:true
+      }, function(){ importFile(f); });
+    });
+
+    ov.addEventListener("click", function(e){
+      if(e.target===ov){ close(); return; }
+      var btn = e.target.closest ? e.target.closest("[data-x]") : null;
+      if(!btn) return;
+      var x = btn.getAttribute("data-x");
+      if(x==="exp"){ exportFile(); return; }
+      if(x==="imp"){ picker.click(); return; }
+      close();
+    });
+
+    var closeBtn = ov.querySelector('[data-x="close"]');
+    if(closeBtn) closeBtn.focus();
+  }
+
+  function done(m){ return m.sa!=null && m.sb!=null && m.sa!==m.sb; }
+  function bad(m){ return m.sa!=null && m.sb!=null && m.sa===m.sb; }
+  function filled(m){ return m.sa!=null || m.sb!=null; }
+
+  /* ---------- standings ---------- */
+  function standings(block){
+    var stats={};
+    block.teamIds.forEach(function(id){
+      stats[id]={id:id,w:0,l:0,gf:0,ga:0};
+    });
+    block.matches.forEach(function(m){
+      if(!done(m)) return;
+      var A=stats[m.a], B=stats[m.b];
+      A.gf+=m.sa; A.ga+=m.sb; B.gf+=m.sb; B.ga+=m.sa;
+      if(m.sa>m.sb){A.w++;B.l++;} else {B.w++;A.l++;}
+    });
+    var rows = block.teamIds.map(function(id){
+      var s=stats[id]; s.dif=s.gf-s.ga; return s;
+    });
+    rows.sort(function(x,y){
+      return (y.w-x.w) || (y.dif-x.dif) || (y.gf-x.gf);
+    });
+    // teams tied with the leader on every criterion
+    var tied=[rows[0].id];
+    for(var i=1;i<rows.length;i++){
+      if(rows[i].w===rows[0].w && rows[i].dif===rows[0].dif && rows[i].gf===rows[0].gf) tied.push(rows[i].id);
+      else break;
+    }
+    var needPick = tied.length>1;
+    if(needPick && block.manualFirst && tied.indexOf(block.manualFirst)>=0){
+      var pick = rows.filter(function(r){return r.id===block.manualFirst;})[0];
+      rows = [pick].concat(rows.filter(function(r){return r.id!==block.manualFirst;}));
+      needPick = false;
+    }
+    rows.forEach(function(r,i){ r.rank = needPick && tied.indexOf(r.id)>=0 ? null : i+1; });
+    return {rows:rows, tied:tied, needPick:needPick,
+            allPlayed: block.matches.every(done),
+            winner: (!needPick && block.matches.every(done)) ? rows[0].id : null};
+  }
+  function blockState(b){ return standings(b); }
+  function allQualifyingDone(){
+    return state.blocks.length===4 && state.blocks.every(function(b){
+      var st = blockState(b); return st.allPlayed && st.winner;
+    });
+  }
+
+  /* ---------- transitions ---------- */
+  function buildBlocks(){
+    var names = parseTeams(state.raw);
+    if(countOutOfRange(names.length)) return;
+    state.teams = names.map(function(n,i){ return {id:"t"+i, name:n}; });
+    var ids = shuffle(state.teams.map(function(t){return t.id;}));
+    var sizes = splitSizes(ids.length), at=0;
+    state.blocks = sizes.map(function(sz,i){
+      var part = ids.slice(at, at+sz); at+=sz;
+      return {
+        id:LETTERS[i],
+        teamIds:part,
+        manualFirst:null,
+        matches:roundRobin(part).map(function(p,j){
+          return {id:LETTERS[i]+"-"+j, a:p.a, b:p.b, sa:null, sb:null};
+        })
+      };
+    });
+    state.final=null;
+    state.phase="qualifying";
+    save(); render();
+  }
+  function drawFinal(){
+    var winners = shuffle(state.blocks.map(function(b){ return blockState(b).winner; }));
+    var src = {};
+    state.blocks.forEach(function(b){ src[blockState(b).winner] = b.id; });
+    state.final = {
+      src:src,
+      semis:[
+        {id:"sf1", a:winners[0], b:winners[1], sa:null, sb:null},
+        {id:"sf2", a:winners[2], b:winners[3], sa:null, sb:null}
+      ],
+      fin:{id:"fin", a:null, b:null, sa:null, sb:null}
+    };
+    state.phase="final";
+    save(); render();
+  }
+  function winnerOf(m){
+    if(!done(m)) return null;
+    return m.sa>m.sb ? m.a : m.b;
+  }
+  function syncFinalMatch(){
+    var f=state.final; if(!f) return;
+    var w1=winnerOf(f.semis[0]), w2=winnerOf(f.semis[1]);
+    if(f.fin.a!==w1 || f.fin.b!==w2){
+      f.fin.a=w1; f.fin.b=w2;
+      if(!w1||!w2){ f.fin.sa=null; f.fin.sb=null; }
+    }
+  }
+  function finalTouched(){
+    var f=state.final; if(!f) return false;
+    return filled(f.semis[0]) || filled(f.semis[1]) || filled(f.fin);
+  }
+
+  /* ---------- render ---------- */
+  var view=document.getElementById("view"),
+      bar=document.getElementById("bar"),
+      app=document.getElementById("app"),
+      stepper=document.getElementById("stepper"),
+      meetInput=document.getElementById("meetName");
+
+  function renderStepper(){
+    var steps=[["1","チーム登録","setup"],["2","予選 4ブロック","qualifying"],["3","決勝トーナメント","final"]];
+    var order={setup:0,qualifying:1,final:2}, cur=order[state.phase];
+    stepper.innerHTML = steps.map(function(s,i){
+      var cls = i===cur ? "now" : (i<cur ? "done":"");
+      return '<span class="step '+cls+'"><span class="n">'+s[0]+'</span>'+s[1]+'</span>'
+        + (i<2 ? '<span class="step-sep">›</span>' : '');
+    }).join("");
+  }
+
+  function countOutOfRange(n){ return n<MIN_TEAMS || n>MAX_TEAMS; }
+  function setupMsgHTML(n, sizes){
+    if(n<MIN_TEAMS) return MIN_TEAMS+'チーム以上でブロック分けできます（現在 <b>'+n+'</b> チーム）';
+    if(n>MAX_TEAMS) return '登録できるのは'+MAX_TEAMS+'チームまでです（現在 <b>'+n+'</b> チーム）';
+    return '<b>'+n+'</b> チームを '+sizes.join("/")+' の4ブロックに分けます';
+  }
+
+  function renderSetup(){
+    var names=parseTeams(state.raw), n=names.length, sizes=splitSizes(n);
+    var problem = n<MIN_TEAMS
+      ? "4ブロックに分けるには"+MIN_TEAMS+"チーム以上が必要です。あと "+(MIN_TEAMS-n)+" チーム入力してください。"
+      : (n>MAX_TEAMS
+          ? "登録できるのは"+MAX_TEAMS+"チームまでです。"+(n-MAX_TEAMS)+" チーム分を削ってください。"
+          : null);
+    var dup = {}, dups=[];
+    names.forEach(function(x){ if(dup[x]) { if(dups.indexOf(x)<0) dups.push(x); } dup[x]=1; });
+
+    view.innerHTML =
+    '<div class="wrap-narrow"><div class="setup-grid">'
+    + '<section class="panel"><div class="panel-hd"><h2>参加チーム</h2>'
+      + '<span class="eyebrow">1行に1チーム</span></div><div class="panel-bd">'
+      + (state.seeded ? '<div class="seed-note"><span>初期値</span><span>♠️／♦️／❤️ の組で13チーム分が入っています。参加チームに合わせて書き換えてください。</span></div>' : '')
+      + '<textarea class="teams" id="teamsInput" spellcheck="false" placeholder="チーム名を1行ずつ入力">'+esc(state.raw)+'</textarea>'
+      + '<p class="field-note">改行区切りで貼り付けできます。空行は無視されます。登録できるのは'+MIN_TEAMS+'〜'+MAX_TEAMS+'チームで、4ブロックに均等配分します。</p>'
+      + '</div></section>'
+    + '<aside style="display:grid;gap:1.1rem">'
+      + '<section class="panel"><div class="panel-hd"><h2>ブロック割り</h2></div><div class="panel-bd">'
+        + '<div class="count-row"><span class="count-big">'+n+'</span><span class="count-unit">チーム</span></div>'
+        + '<div class="split-preview">'+sizes.map(function(sz,i){
+            return '<div class="split-cell"><div class="bl">'+LETTERS[i]+'</div><div class="num">'+sz+'</div><div class="unit">チーム</div></div>';
+          }).join("")+'</div>'
+        + (problem ? '<p class="alert">'+esc(problem)+'</p>'
+            : '<p class="field-note" style="margin:0">総当たり '+sizes.reduce(function(a,s){return a+s*(s-1)/2;},0)+' 試合。各ブロック1位の4チームが決勝トーナメントへ進みます。</p>')
+        + (dups.length ? '<p class="alert" style="margin-top:.6rem">同名のチームがあります：'+esc(dups.join("、"))+'</p>' : '')
+      + '</div></section>'
+      + '<section class="panel"><div class="panel-hd"><h2>大会ルール</h2></div><div class="panel-bd">'
+        + '<ul class="rules-list">'
+        + '<li><span class="k">予選</span><span>ブロック内総当たり</span></li>'
+        + '<li><span class="k">引き分け</span><span>なし（同点スコアは入力エラー）</span></li>'
+        + '<li><span class="k">順位</span><span>勝敗数 → 得失点差 → 総得点</span></li>'
+        + '<li><span class="k">同率時</span><span>3項目すべて同じ場合のみ、1位を手動で指定</span></li>'
+        + '<li><span class="k">決勝</span><span>各ブロック1位の4チームを抽選し、準決勝・決勝</span></li>'
+        + '</ul></div></section>'
+    + '</aside></div></div>';
+
+    var ta=document.getElementById("teamsInput");
+    ta.addEventListener("input", function(){
+      state.raw=ta.value; state.seeded=false; save();
+      var nn=parseTeams(state.raw).length, ss=splitSizes(nn);
+      var cb=view.querySelector(".count-big"); if(cb) cb.textContent=nn;
+      var cells=view.querySelectorAll(".split-cell .num");
+      for(var i=0;i<cells.length;i++) cells[i].textContent=ss[i];
+      var btn=document.getElementById("btnGo"); if(btn) btn.disabled = countOutOfRange(nn);
+      var st=document.getElementById("setupMsg");
+      if(st) st.innerHTML = setupMsgHTML(nn, ss);
+    });
+
+    bar.innerHTML = '<div class="actionbar"><span class="msg" id="setupMsg">'
+      + setupMsgHTML(n, sizes)
+      + '</span><span class="right">'
+      + '<button class="btn primary" id="btnGo"'+(problem?" disabled":"")+'>シャッフルして予選を組む</button>'
+      + '</span></div>';
+    document.getElementById("btnGo").addEventListener("click", buildBlocks);
+  }
+
+  function renderBlock(b){
+    var st=blockState(b);
+    var order = b.teamIds;                       // display order = draw order
+    var pos={}; order.forEach(function(id,i){ pos[id]=i; });
+    var rankOf={}, statOf={};
+    st.rows.forEach(function(r){ rankOf[r.id]=r.rank; statOf[r.id]=r; });
+
+    // head
+    var html='<section class="block"><div class="block-hd">'
+      + '<span class="block-letter">'+b.id+'</span>'
+      + '<h2>ブロック</h2>'
+      + '<span class="prog'+(st.allPlayed?' full':'')+'">消化 <b>'
+      + b.matches.filter(done).length+'/'+b.matches.length+'</b></span>'
+      + '</div>';
+
+    // cross table
+    html += '<div class="rr-scroll"><table class="rr"><thead><tr><th class="tm">チーム</th>'
+      + order.map(function(id,i){ return '<th>'+CIRCLED[i]+'</th>'; }).join("")
+      + '<th>勝</th><th>敗</th><th class="col-gf">得</th><th class="col-ga">失</th>'
+      + '<th>差</th><th>順位</th></tr></thead><tbody>';
+
+    order.forEach(function(id,i){
+      var s=statOf[id], isFirst = st.winner===id;
+      html += '<tr'+(isFirst?' class="first"':'')+'>'
+        + '<td class="tm"><span class="idx">'+CIRCLED[i]+'</span>'+esc(teamName(id))
+        + (isFirst?'<span class="thru">通過</span>':'')+'</td>';
+      order.forEach(function(oid,j){
+        if(i===j){ html += '<td class="cell-self">■</td>'; return; }
+        var m = b.matches.filter(function(x){
+          return (x.a===id&&x.b===oid)||(x.a===oid&&x.b===id);
+        })[0];
+        if(!m || !done(m)){ html += '<td class="cell-none">–</td>'; return; }
+        var mine = m.a===id ? m.sa : m.sb, theirs = m.a===id ? m.sb : m.sa;
+        var win = mine>theirs;
+        html += '<td><span class="mk '+(win?'w':'l')+'">'+(win?'○':'×')+'</span>'
+              + '<span class="num">'+mine+'-'+theirs+'</span></td>';
+      });
+      html += '<td class="num">'+s.w+'</td><td class="num">'+s.l+'</td>'
+            + '<td class="num col-gf">'+s.gf+'</td><td class="num col-ga">'+s.ga+'</td>'
+            + '<td class="num dif">'+(s.dif>0?"+":"")+s.dif+'</td>'
+            + '<td class="rank">'+(s.rank==null?'?':s.rank)+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+
+    // tiebreak picker
+    if(st.needPick && st.allPlayed){
+      html += '<div class="tiebreak"><span>'
+        + (state.pres
+            ? esc(st.tied.map(teamName).join("・")) + ' が勝敗数・得失点差・総得点で並び、1位を決定中です。'
+            : '勝敗数・得失点差・総得点がすべて同じため、1位を指定してください。')
+        + '</span>'
+        + '<select data-tie="'+b.id+'"><option value="">選択…</option>'
+        + st.tied.map(function(id){ return '<option value="'+id+'">'+esc(teamName(id))+'</option>'; }).join("")
+        + '</select></div>';
+    }
+
+    // match inputs
+    html += '<div class="matches">';
+    b.matches.forEach(function(m,i){
+      var d=done(m), e=bad(m);
+      var aWon = d && m.sa>m.sb, bWon = d && m.sb>m.sa;
+      html += '<div class="match'+(e?' err':'')+'">'
+        + '<span class="mno">第'+(i+1)+'試合</span>'
+        + '<span class="side l '+(aWon?'won':(bWon?'lost':''))+'">'
+          + '<span class="tname">'+esc(teamName(m.a))+'</span>'
+          + (d?'<span class="wl">'+(aWon?'勝':'敗')+'</span>':'')+'</span>'
+        + '<input class="score" inputmode="numeric" maxlength="3" placeholder="–" aria-label="'+esc(teamName(m.a))+'の得点"'
+          + ' data-k="q|'+b.id+'|'+i+'|a" value="'+(m.sa==null?"":m.sa)+'">'
+        + '<span class="dash">-</span>'
+        + '<input class="score" inputmode="numeric" maxlength="3" placeholder="–" aria-label="'+esc(teamName(m.b))+'の得点"'
+          + ' data-k="q|'+b.id+'|'+i+'|b" value="'+(m.sb==null?"":m.sb)+'">'
+        + '<span class="side r '+(bWon?'won':(aWon?'lost':''))+'">'
+          + (d?'<span class="wl">'+(bWon?'勝':'敗')+'</span>':'')
+          + '<span class="tname">'+esc(teamName(m.b))+'</span></span>'
+        + '</div>';
+    });
+    if(b.matches.some(bad)){
+      html += '<p class="alert" style="margin:.5rem .35rem 0">引き分けは無効です。どちらかの得点を修正してください。</p>';
+    }
+    html += '</div></section>';
+    return html;
+  }
+
+  function renderQualifying(){
+    view.innerHTML = '<div class="blocks">'+state.blocks.map(renderBlock).join("")+'</div>';
+
+    var ready=allQualifyingDone();
+    var remain=0, needPick=0;
+    state.blocks.forEach(function(b){
+      var st=blockState(b);
+      remain += b.matches.filter(function(m){return !done(m);}).length;
+      if(st.allPlayed && st.needPick) needPick++;
+    });
+    var msg = ready ? '予選終了。<b>4チーム</b>が決勝トーナメントに進みます。'
+      : (remain ? '残り <b>'+remain+'</b> 試合の結果を入力してください。'
+                : (needPick ? '<b>'+needPick+'</b> ブロックで1位の指定が必要です。' : '入力を続けてください。'));
+
+    bar.innerHTML = '<div class="actionbar">'
+      + '<button class="btn setup-only" id="btnBack">チーム登録に戻る</button>'
+      + '<span class="msg">'+msg+'</span>'
+      + '<span class="right"><button class="btn primary" id="btnDraw"'+(ready?"":" disabled")+'>決勝トーナメントを抽選する</button></span>'
+      + '</div>';
+
+    document.getElementById("btnBack").addEventListener("click", function(){
+      var entered = state.blocks.reduce(function(a,b){
+        return a + b.matches.filter(filled).length;
+      },0);
+      ask({
+        title:"チーム登録に戻る",
+        body: entered
+          ? "現在のブロック分けと、入力済みの "+entered+" 試合の結果は失われます。チーム名の一覧はそのまま残ります。"
+          : "現在のブロック分けは破棄されます。チーム名の一覧はそのまま残ります。",
+        ok:"戻る", danger:true
+      }, function(){
+        state.phase="setup"; state.blocks=[]; state.final=null; save(); render(); window.scrollTo(0,0);
+      });
+    });
+    document.getElementById("btnDraw").addEventListener("click", function(){
+      if(allQualifyingDone()) drawFinal();
+    });
+  }
+
+  function tieCard(m, label, seeds){
+    var d=done(m), e=bad(m), pending = m.a==null||m.b==null;
+    function row(side){
+      var id = side==="a" ? m.a : m.b;
+      var sc = side==="a" ? m.sa : m.sb;
+      var w = d && ((side==="a") === (m.sa>m.sb));
+      var cls = d ? (w?"won":"lost") : "";
+      return '<div class="tie-row '+cls+'">'
+        + '<span class="tname">'
+          + (seeds && id && seeds[id] ? '<span class="seedmark">'+seeds[id]+'ブロック1位</span>' : '')
+          + esc(id?teamName(id):"勝者未定")+'</span>'
+        + '<input class="score" inputmode="numeric" maxlength="3" placeholder="–" aria-label="得点"'
+          + (pending?" disabled":"")
+          + ' data-k="f|'+m.id+'|'+side+'" value="'+(sc==null?"":sc)+'">'
+        + '</div>';
+    }
+    return '<div class="tie'+(pending?" pending":"")+'">'
+      + '<div class="tie-hd">'+label+'</div>'+row("a")+row("b")
+      + (e?'<p class="alert" style="margin:.4rem .7rem .6rem">引き分けは無効です。</p>':'')
+      + '</div>';
+  }
+
+  /* 大会前後にロゴ画像を投影するための表紙。大画面モードと組み合わせて使う。 */
+  function renderCover(){
+    view.innerHTML =
+      '<div class="cover">'
+      + '<div class="logo-slot cover-logo"><img class="logo" alt="'+esc(THANKS)+'"></div>'
+      + '<div class="cover-noimg" hidden>画像 <code>logo.jpg</code> をアプリと同じ場所に置くと、ここに表示されます。</div>'
+      + '<div><div class="cover-eyebrow">DARTS TOURNAMENT</div>'
+      + '<h2>'+esc(state.meetName || "ダーツ大会")+'</h2></div>'
+      + '</div>';
+    bar.innerHTML = "";
+  }
+
+  function renderFinal(){
+    syncFinalMatch();
+    var f=state.final, seeds=f.src;
+    var champ = winnerOf(f.fin);
+
+    view.innerHTML =
+      '<div class="bracket">'
+      + '<div class="col-hd" style="grid-column:1">準決勝</div>'
+      + '<div class="col-hd" style="grid-column:2">決勝</div>'
+      + '<div class="col-hd" style="grid-column:3">優勝</div>'
+      + '<div class="semis">'
+        + tieCard(f.semis[0],"準決勝 第1試合",seeds)
+        + tieCard(f.semis[1],"準決勝 第2試合",seeds)
+      + '</div>'
+      + '<div class="finalslot">'+tieCard(f.fin,"決勝",seeds)+'</div>'
+      + '<div class="champslot">'
+        + (champ ? '<div class="champ"><div class="champ-dart">'
+                     + dartSVG("var(--gold)","var(--brand)","var(--gold-line)",-32)
+                   + '</div><div class="lbl">CHAMPION</div><div class="nm">'+esc(teamName(champ))+'</div></div>'
+                 : '<div class="champ empty"><div class="lbl">CHAMPION</div><div class="nm">決勝の結果待ち</div></div>')
+      + '</div></div>'
+      + '<div class="thanks"><span class="rule"></span><p>'+esc(THANKS)+'</p></div>';
+
+    var canRedraw = !finalTouched();
+    bar.innerHTML = '<div class="actionbar">'
+      + '<button class="btn setup-only" id="btnBackQ">予選表に戻る</button>'
+      + '<button class="btn setup-only" id="btnRedraw"'+(canRedraw?"":" disabled")+'>組み合わせを再抽選</button>'
+      + '<span class="msg">'+(champ
+          ? '優勝は <b>'+esc(teamName(champ))+'</b>。'
+          : (canRedraw ? '準決勝の結果を入力すると決勝の対戦が決まります。'
+                       : '結果入力中は再抽選できません。'))+'</span>'
+      + '<span class="right"><button class="btn gold" id="btnPres2">▣ 大画面で表示</button></span>'
+      + '</div>';
+
+    document.getElementById("btnBackQ").addEventListener("click", function(){
+      state.phase="qualifying"; save(); render();
+    });
+    document.getElementById("btnRedraw").addEventListener("click", function(){
+      if(finalTouched()) return;
+      ask({
+        title:"組み合わせを再抽選",
+        body:"予選を通過した4チームの組み合わせを、もう一度シャッフルして決めます。",
+        ok:"再抽選する"
+      }, drawFinal);
+    });
+    document.getElementById("btnPres2").addEventListener("click", togglePres);
+  }
+
+  /* 大画面モードでは横スクロールできないので、星取表が枠に収まる文字サイズまで縮める。
+     4チームのブロックは列が多く、3桁スコアだとはみ出すため。
+     4ブロックで見た目を揃えるよう、いちばん厳しいブロックのサイズを全体に適用する。 */
+  function fitTables(){
+    var MIN=9, MAX=30, STEP=0.5;
+    var boxes=[].slice.call(document.querySelectorAll(".block .rr-scroll"));
+    boxes.forEach(function(box){
+      var t=box.querySelector("table"); if(t) t.style.fontSize="";
+    });
+    if(!state.pres || !boxes.length) return;
+
+    function overflows(box){ return box.scrollWidth > box.clientWidth + 1; }
+
+    /* 1) 各ブロックについて、横にはみ出さない最大の文字サイズを求める */
+    var best=null;
+    boxes.forEach(function(box){
+      var t=box.querySelector("table"); if(!t) return;
+      var size=parseFloat(window.getComputedStyle(t).fontSize), guard=0;
+      if(overflows(box)){
+        while(overflows(box) && size>MIN && guard++<80){
+          size-=STEP; t.style.fontSize=size+"px";
+        }
+      } else {
+        while(size<MAX && guard++<80){
+          t.style.fontSize=(size+STEP)+"px";
+          if(overflows(box)){ t.style.fontSize=size+"px"; break; }
+          size+=STEP;
+        }
+      }
+      if(best===null || size<best) best=size;
+      t.style.fontSize="";
+    });
+    if(best==null) return;
+
+    /* 2) 4ブロックで揃えて適用し、縦にあふれるなら全体を縮める */
+    function apply(s){
+      boxes.forEach(function(box){
+        var t=box.querySelector("table"); if(t) t.style.fontSize=s+"px";
+      });
+    }
+    apply(best);
+    var guard=0;
+    while(document.documentElement.scrollHeight > window.innerHeight + 1
+          && best>MIN && guard++<80){
+      best-=STEP; apply(best);
+    }
+  }
+
+  function render(){
+    var act=document.activeElement;
+    var k = act && act.dataset ? act.dataset.k : null;
+    var sel = k && act.setSelectionRange ? [act.selectionStart, act.selectionEnd] : null;
+
+    app.classList.toggle("pres", !!state.pres);
+    document.getElementById("btnPres").textContent = state.pres ? "▣ 編集に戻る" : "▣ 大画面表示";
+    meetInput.value = state.meetName;
+    renderStepper();
+    stepper.hidden = !!state.cover;
+    document.getElementById("btnCover").textContent = state.cover ? "◎ 表紙を閉じる" : "◎ 表紙";
+
+    if(state.cover) renderCover();
+    else if(state.phase==="setup") renderSetup();
+    else if(state.phase==="qualifying") renderQualifying();
+    else renderFinal();
+
+    wireLogos();
+
+    if(k){
+      var el=document.querySelector('[data-k="'+k+'"]');
+      if(el){ el.focus(); if(sel && el.setSelectionRange){ try{ el.setSelectionRange(sel[0],sel[1]); }catch(e){} } }
+    }
+    fitTables();
+  }
+
+  /* ---------- input wiring (delegated) ---------- */
+  document.addEventListener("input", function(ev){
+    var el=ev.target;
+    if(!el.dataset || !el.dataset.k) return;
+    var raw = el.value.replace(/[^0-9]/g,"").slice(0,3);
+    if(raw!==el.value) el.value=raw;
+    var val = raw==="" ? null : parseInt(raw,10);
+    var parts = el.dataset.k.split("|");
+
+    if(parts[0]==="q"){
+      var b = state.blocks.filter(function(x){return x.id===parts[1];})[0];
+      if(!b) return;
+      var m = b.matches[parseInt(parts[2],10)];
+      m[parts[3]==="a"?"sa":"sb"] = val;
+      b.manualFirst = null;
+    } else if(parts[0]==="f"){
+      var f=state.final; if(!f) return;
+      var mm = parts[1]==="fin" ? f.fin : f.semis[parts[1]==="sf1"?0:1];
+      mm[parts[2]==="a"?"sa":"sb"] = val;
+    }
+    save(); render();
+  });
+
+  document.addEventListener("change", function(ev){
+    var s=ev.target;
+    if(s.dataset && s.dataset.tie){
+      var b=state.blocks.filter(function(x){return x.id===s.dataset.tie;})[0];
+      if(b){ b.manualFirst = s.value || null; save(); render(); }
+    }
+  });
+
+  meetInput.addEventListener("input", function(){ state.meetName=meetInput.value; save(); });
+
+  function togglePres(){ state.pres=!state.pres; save(); render(); window.scrollTo(0,0); }
+  document.getElementById("btnPres").addEventListener("click", togglePres);
+
+  document.getElementById("btnReset").addEventListener("click", function(){
+    ask({
+      title:"最初からやり直す",
+      body:"チーム名・ブロック分け・全試合の結果をすべて消します。この操作は取り消せません。",
+      ok:"すべて消す", danger:true
+    }, function(){
+      state={phase:"setup", meetName:"", raw:"", seeded:false, teams:[], blocks:[], final:null,
+             pres:false, cover:false};
+      save(); render(); window.scrollTo(0,0);
+    });
+  });
+
+  document.getElementById("btnCover").addEventListener("click", function(){
+    state.cover=!state.cover; save(); render(); window.scrollTo(0,0);
+  });
+
+  document.getElementById("btnTheme").addEventListener("click", function(){
+    var r=document.documentElement, cur=r.getAttribute("data-theme");
+    var dark = cur ? cur==="dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    r.setAttribute("data-theme", dark ? "light" : "dark");
+  });
+
+  var btnData=document.getElementById("btnData");
+  if(btnData) btnData.addEventListener("click", dataDialog);
+
+  /* 背景のダーツ盤とダーツを描く（一度だけ） */
+  document.getElementById("decoBoard").innerHTML = dartboardSVG();
+  document.getElementById("decoDart").innerHTML  = dartSVG("var(--ink-2)","var(--brand)","var(--gold)",-38);
+
+  /* オフラインで動作中であることを表示（テザリングを切ったまま使えるのを確認できる） */
+  function syncOnline(){
+    document.body.classList.toggle("is-offline", navigator.onLine === false);
+  }
+  window.addEventListener("online", syncOnline);
+  window.addEventListener("offline", syncOnline);
+  syncOnline();
+
+  /* 画面の回転・外部ディスプレイ接続で幅が変わったら、表のサイズを再計算する */
+  var fitTimer=null;
+  window.addEventListener("resize", function(){
+    clearTimeout(fitTimer);
+    fitTimer=setTimeout(fitTables, 120);
+  });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitTables);
+
+  render();
+})();
+
+/* オフライン動作のための Service Worker 登録 */
+if("serviceWorker" in navigator){
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js").catch(function(){ /* 失敗してもアプリは動く */ });
+  });
+}
+</script>
+</body>
+</html>

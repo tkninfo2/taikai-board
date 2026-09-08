@@ -1,0 +1,16 @@
+{
+  "name": "4ブロック大会ボード",
+  "short_name": "大会ボード",
+  "description": "4ブロックの総当たり予選から決勝トーナメントまでを進行する大会運営ボード。",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1B3A6B",
+  "theme_color": "#1B3A6B",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
