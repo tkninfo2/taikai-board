@@ -2,7 +2,7 @@
    アプリ本体は install 時にキャッシュし、以後はキャッシュ優先で配信する。
    アプリを更新したら CACHE の数字を上げること（古いキャッシュは自動で削除される）。 */
 
-const CACHE = "block4-board-v2";
+const CACHE = "block4-board-v3";
 
 /* アプリ本体。ここが揃っていればオフラインで起動できる。 */
 const SHELL = [

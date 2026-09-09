@@ -134,7 +134,7 @@
   .meet-name{
     font-family:"Shippori Mincho B1",serif;font-weight:700;font-size:1em;
     color:var(--ink);background:transparent;border:none;border-bottom:1px dashed var(--line-strong);
-    padding:.15rem .2rem;min-width:8ch;max-width:22ch;
+    padding:.15rem .2rem;min-width:8ch;max-width:15ch;
   }
   .meet-name:focus{outline:2px solid var(--brand);outline-offset:2px;border-radius:3px}
 
@@ -185,8 +185,81 @@
   .wrap-narrow{max-width:62rem;margin:0 auto}
 
   /* ---------- setup ---------- */
-  .setup-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:1.1rem;align-items:start}
-  @media (max-width:860px){.setup-grid{grid-template-columns:1fr}}
+  .setup-wrap{max-width:74rem;margin:0 auto;display:grid;gap:1.1rem}
+  .setup-top{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:1.1rem;align-items:start}
+  @media (max-width:900px){.setup-top{grid-template-columns:1fr}}
+
+  .setup-controls{display:grid;gap:1.05rem}
+  .ctrl{display:flex;align-items:center;flex-wrap:wrap;gap:.6rem .8rem}
+  .ctrl-lbl{font-size:.88em;font-weight:700;color:var(--ink-2);min-width:7.5rem}
+  .ctrl-hint{font-size:.8em;color:var(--ink-3);line-height:1.6}
+
+  .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:9px;overflow:hidden}
+  .seg-btn{
+    min-height:42px;padding:.4rem 1.1rem;border:none;background:var(--surface);
+    color:var(--ink-2);font-size:.92em;font-weight:600;font-family:inherit;
+  }
+  .seg-btn + .seg-btn{border-left:1px solid var(--line-strong)}
+  .seg-btn:hover{background:var(--surface-2)}
+  .seg-btn.on{background:var(--brand);color:var(--brand-fg)}
+  .seg-btn:focus-visible{outline:2px solid var(--brand);outline-offset:-3px}
+
+  .stepnum{display:inline-flex;align-items:center;border:1px solid var(--line-strong);border-radius:9px;overflow:hidden}
+  .step-btn{
+    width:2.6rem;min-height:42px;border:none;background:var(--surface);
+    color:var(--ink-2);font-size:1.15em;font-family:inherit;
+  }
+  .step-btn:hover{background:var(--surface-2)}
+  .step-btn[disabled]{opacity:.35;cursor:not-allowed}
+  .step-btn:focus-visible{outline:2px solid var(--brand);outline-offset:-3px}
+  .stepnum-v{
+    min-width:3.2rem;text-align:center;
+    font-family:"Oswald",sans-serif;font-variant-numeric:tabular-nums;
+    font-size:1.35em;font-weight:600;color:var(--ink);
+    border-left:1px solid var(--line-strong);border-right:1px solid var(--line-strong);
+    align-self:stretch;display:grid;place-items:center;
+  }
+
+  /* ---------- カードごとのニックネーム入力 ---------- */
+  .cardgrid-scroll{overflow-x:auto}
+  table.cardgrid{width:100%;border-collapse:collapse}
+  table.cardgrid th,table.cardgrid td{padding:.3rem .35rem;text-align:left}
+  table.cardgrid thead th{
+    font-size:.78em;font-weight:700;color:var(--ink-3);letter-spacing:.04em;
+    padding-bottom:.45rem;border-bottom:1px solid var(--line);white-space:nowrap;
+  }
+  table.cardgrid tbody tr + tr td{border-top:1px solid var(--line)}
+  .cg-no{width:4.2rem}
+  .cardno{
+    display:grid;place-items:center;width:2.1rem;height:2.1rem;border-radius:6px;
+    background:var(--surface-2);border:1px solid var(--line);
+    font-family:"Oswald",sans-serif;font-variant-numeric:tabular-nums;
+    font-size:1.02em;font-weight:600;color:var(--ink-2);
+  }
+  .suit{font-size:1.15em;line-height:1;vertical-align:-.05em}
+  .suit.s,.suit.c{color:var(--ink)}
+  .suit.d,.suit.h{color:var(--danger)}
+  input.nick{
+    width:100%;min-height:42px;padding:.35rem .6rem;
+    font-family:inherit;font-size:.95em;
+    border:1px solid var(--line-strong);border-radius:7px;
+    background:var(--surface-2);color:var(--ink);
+  }
+  input.nick:focus{outline:2px solid var(--brand);outline-offset:1px;background:var(--surface)}
+  input.nick::placeholder{color:var(--ink-3);opacity:.6}
+  .cg-name{min-width:12rem}
+  .rowname{
+    font-size:.9em;font-weight:600;color:var(--ink);
+    display:block;overflow-wrap:anywhere;line-height:1.5;
+  }
+  .rowname.blank{font-weight:400;color:var(--ink-3)}
+
+  /* ---------- 追加チーム ---------- */
+  .extras{display:grid;gap:.55rem;justify-items:start}
+  .extra-row{display:flex;align-items:center;gap:.6rem;width:100%;max-width:34rem}
+  .extra-no{font-size:.8em;color:var(--ink-3);min-width:3.4rem}
+  .extra-del{color:var(--danger);font-size:.82em;min-height:42px}
+  .extra-del:hover{background:var(--danger-soft);color:var(--danger)}
   .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
   .panel-hd{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.85rem 1rem;border-bottom:1px solid var(--line)}
   .panel-hd h2{font-size:1.05em}
@@ -522,7 +595,7 @@
       <span class="offline-note hide-pres" title="通信なしで動作中"><span class="dot"></span>オフライン</span>
       <button class="btn quiet" id="btnCover">◎ 表紙</button>
       <button class="btn quiet hide-pres" id="btnData">⤓ データ</button>
-      <button class="btn quiet hide-pres" id="btnTheme" title="表示テーマ切替">◐ テーマ</button>
+      <button class="btn quiet hide-pres" id="btnTheme" title="表示テーマ切替" aria-label="表示テーマ切替">◐</button>
       <button class="btn" id="btnPres">▣ 大画面表示</button>
       <button class="btn quiet hide-pres" id="btnReset">最初から</button>
     </div>
@@ -545,21 +618,40 @@
 
   var THANKS = "ツバサ　お疲れさま＆ありがとう！";
 
-  /* 初期値：♠️／♦️／❤️ の組で13チーム */
-  var SAMPLE = (function(){
-    var out=[];
-    for(var i=1;i<=13;i++) out.push("♠️"+i+"／♦️"+i+"／❤️"+i);
-    return out;
-  })();
+  /* トランプのマーク。チーム名はこの順にニックネームを "/" で繋ぐ。
+     1チーム3名のときはクローバーを使わない（カードから抜いておく運用）。 */
+  var SUITS = [
+    {key:"s", mark:"♠", name:"スペード"},
+    {key:"c", mark:"♣", name:"クローバー"},
+    {key:"d", mark:"♦", name:"ダイヤ"},
+    {key:"h", mark:"♥", name:"ハート"}
+  ];
+
+  function newSetup(){
+    return {perTeam:4, teamCount:12, nicks:{}, extras:[]};
+  }
 
   var state = load() || {
     phase:"setup",
     meetName:"ツバサ ありがと会",
-    raw:SAMPLE.join("\n"),
-    seeded:true,
+    setup:newSetup(),
     teams:[], blocks:[], final:null,
     pres:false, cover:false
   };
+
+  /* 旧バージョンの保存データを引き継ぐ（チーム名の一覧は追加チームとして残す） */
+  if(!state.setup){
+    state.setup = newSetup();
+    if(typeof state.raw === "string" && state.raw.trim()){
+      state.setup.extras = state.raw.split("\n")
+        .map(function(x){ return x.trim(); })
+        .filter(function(x){ return x.length>0; })
+        .slice(0, MAX_TEAMS);
+    }
+  }
+  if(!state.setup.nicks) state.setup.nicks = {};
+  if(!state.setup.extras) state.setup.extras = [];
+  delete state.raw; delete state.seeded;
 
   /* ---------- storage ---------- */
   function save(){
@@ -575,10 +667,37 @@
   }
 
   /* ---------- helpers ---------- */
-  function parseTeams(raw){
-    return String(raw||"").split("\n")
-      .map(function(s){ return s.replace(/\s+$/,"").replace(/^\s+/,""); })
-      .filter(function(s){ return s.length>0; });
+  /* ---------- チーム名の組み立て ---------- */
+  /* 使うマーク。1チーム3名ならクローバーを外す */
+  function activeSuits(){
+    return state.setup.perTeam===4
+      ? SUITS
+      : SUITS.filter(function(x){ return x.key!=="c"; });
+  }
+  function nickOf(suitKey, num){
+    return String(state.setup.nicks[suitKey+num] || "").trim();
+  }
+  /* 同じ数字のニックネームを ♠ → ♣ → ♦ → ♥ の順に "/" で繋ぐ。
+     空欄は詰めるので、余分なスラッシュは出ない。 */
+  function rowTeamName(num){
+    return activeSuits().map(function(x){ return nickOf(x.key, num); })
+      .filter(function(v){ return v.length>0; }).join("/");
+  }
+  function rowFilledCount(num){
+    return activeSuits().filter(function(x){ return nickOf(x.key,num).length>0; }).length;
+  }
+  /* 登録されるチーム名の一覧。カードの行（名前が1つ以上入っている行）＋追加チーム */
+  function derivedTeams(){
+    var out=[];
+    for(var n=1;n<=state.setup.teamCount;n++){
+      var nm=rowTeamName(n);
+      if(nm) out.push(nm);
+    }
+    state.setup.extras.forEach(function(x){
+      var v=String(x||"").trim();
+      if(v) out.push(v);
+    });
+    return out;
   }
   function splitSizes(n){
     var base = Math.floor(n/4), rem = n%4, out=[];
@@ -742,8 +861,12 @@
       state = st;
       if(!state.blocks) state.blocks = [];
       if(!state.teams) state.teams = [];
-      if(typeof state.raw !== "string") state.raw = "";
-      state.pres = false;
+      if(!state.setup) state.setup = newSetup();
+      if(!state.setup.nicks) state.setup.nicks = {};
+      if(!state.setup.extras) state.setup.extras = [];
+      if(!state.setup.perTeam) state.setup.perTeam = 4;
+      if(!state.setup.teamCount) state.setup.teamCount = 12;
+      state.pres = false; state.cover = false;
       save(); render(); window.scrollTo(0,0);
       note("読み込みました","保存されていた進行状況に切り替えました。");
     };
@@ -753,7 +876,7 @@
   function dataDialog(){
     var prev = document.activeElement;
     var labels = {setup:"チーム登録", qualifying:"予選", final:"決勝トーナメント"};
-    var teamCount = parseTeams(state.raw).length;
+    var teamCount = derivedTeams().length;
     var ov = document.createElement("div");
     ov.className = "overlay";
     ov.innerHTML =
@@ -853,7 +976,7 @@
 
   /* ---------- transitions ---------- */
   function buildBlocks(){
-    var names = parseTeams(state.raw);
+    var names = derivedTeams();
     if(countOutOfRange(names.length)) return;
     state.teams = names.map(function(n,i){ return {id:"t"+i, name:n}; });
     var ids = shuffle(state.teams.map(function(t){return t.id;}));
@@ -913,7 +1036,7 @@
       meetInput=document.getElementById("meetName");
 
   function renderStepper(){
-    var steps=[["1","チーム登録","setup"],["2","予選 4ブロック","qualifying"],["3","決勝トーナメント","final"]];
+    var steps=[["1","チーム登録","setup"],["2","予選","qualifying"],["3","決勝","final"]];
     var order={setup:0,qualifying:1,final:2}, cur=order[state.phase];
     stepper.innerHTML = steps.map(function(s,i){
       var cls = i===cur ? "now" : (i<cur ? "done":"");
@@ -929,62 +1052,166 @@
     return '<b>'+n+'</b> チームを '+sizes.join("/")+' の4ブロックに分けます';
   }
 
+  function splitNote(n, sizes){
+    if(n<MIN_TEAMS) return "4ブロックに分けるには"+MIN_TEAMS+"チーム以上が必要です。あと "+(MIN_TEAMS-n)+" チーム。";
+    if(n>MAX_TEAMS) return "登録できるのは"+MAX_TEAMS+"チームまでです。"+(n-MAX_TEAMS)+" チーム分を減らしてください。";
+    return "総当たり "+sizes.reduce(function(a,x){return a+x*(x-1)/2;},0)
+         + " 試合。各ブロック1位の4チームが決勝トーナメントへ進みます。";
+  }
+
+  /* 入力のたびに全体を作り直すと打ちにくいので、変わるところだけ書き換える */
+  function refreshSetup(){
+    var names=derivedTeams(), n=names.length, sizes=splitSizes(n);
+
+    var cb=document.querySelector(".count-big"); if(cb) cb.textContent=n;
+    var cells=document.querySelectorAll(".split-cell .num");
+    for(var i=0;i<cells.length;i++) cells[i].textContent=sizes[i];
+
+    var note=document.getElementById("splitNote");
+    if(note){
+      note.textContent = splitNote(n, sizes);
+      note.className = countOutOfRange(n) ? "alert" : "field-note";
+      note.style.margin = "0";
+    }
+    var st=document.getElementById("setupMsg");
+    if(st) st.innerHTML = setupMsgHTML(n, sizes);
+    var go=document.getElementById("btnGo");
+    if(go) go.disabled = countOutOfRange(n);
+    var add=document.getElementById("btnAddTeam");
+    if(add) add.disabled = n>=MAX_TEAMS;
+
+    for(var r=1;r<=state.setup.teamCount;r++){
+      var cellName=document.querySelector('[data-rowname="'+r+'"]');
+      if(!cellName) continue;
+      var nm=rowTeamName(r);
+      cellName.textContent = nm || "未入力";
+      cellName.classList.toggle("blank", !nm);
+    }
+
+    var dupBox=document.getElementById("dupNote");
+    if(dupBox){
+      var seen={}, dups=[];
+      names.forEach(function(x){
+        if(seen[x] && dups.indexOf(x)<0) dups.push(x);
+        seen[x]=1;
+      });
+      dupBox.hidden = dups.length===0;
+      if(dups.length) dupBox.textContent = "同じチーム名があります："+dups.join("、");
+    }
+  }
+
   function renderSetup(){
-    var names=parseTeams(state.raw), n=names.length, sizes=splitSizes(n);
-    var problem = n<MIN_TEAMS
-      ? "4ブロックに分けるには"+MIN_TEAMS+"チーム以上が必要です。あと "+(MIN_TEAMS-n)+" チーム入力してください。"
-      : (n>MAX_TEAMS
-          ? "登録できるのは"+MAX_TEAMS+"チームまでです。"+(n-MAX_TEAMS)+" チーム分を削ってください。"
-          : null);
-    var dup = {}, dups=[];
-    names.forEach(function(x){ if(dup[x]) { if(dups.indexOf(x)<0) dups.push(x); } dup[x]=1; });
+    var su=state.setup;
+    var names=derivedTeams(), n=names.length, sizes=splitSizes(n);
+    var suits=activeSuits();
+
+    /* --- カード表 --- */
+    var grid = '<div class="cardgrid-scroll"><table class="cardgrid">'
+      + '<thead><tr><th class="cg-no">カード</th>'
+      + suits.map(function(x){
+          return '<th><span class="suit '+x.key+'">'+x.mark+'</span> '+x.name+'</th>';
+        }).join("")
+      + '<th class="cg-name">チーム名</th></tr></thead><tbody>';
+    for(var num=1; num<=su.teamCount; num++){
+      grid += '<tr><td class="cg-no"><span class="cardno">'+num+'</span></td>'
+        + suits.map(function(x){
+            return '<td><input class="nick" type="text" spellcheck="false"'
+              + ' data-k="n|'+x.key+'|'+num+'"'
+              + ' aria-label="'+x.name+num+'のニックネーム"'
+              + ' placeholder="ニックネーム"'
+              + ' value="'+esc(state.setup.nicks[x.key+num]||"")+'"></td>';
+          }).join("")
+        + '<td class="cg-name"><span class="rowname'+(rowTeamName(num)?"":" blank")+'" data-rowname="'+num+'">'
+          + esc(rowTeamName(num) || "未入力")+'</span></td></tr>';
+    }
+    grid += '</tbody></table></div>';
+
+    /* --- 追加チーム --- */
+    var extras = '<div class="extras">';
+    if(su.extras.length){
+      extras += su.extras.map(function(v,i){
+        return '<div class="extra-row">'
+          + '<span class="extra-no">追加'+(i+1)+'</span>'
+          + '<input class="nick" type="text" spellcheck="false" data-k="x|'+i+'"'
+          + ' aria-label="追加チーム'+(i+1)+'のチーム名" placeholder="チーム名を入力"'
+          + ' value="'+esc(v||"")+'">'
+          + '<button class="btn quiet extra-del" data-delx="'+i+'" aria-label="追加'+(i+1)+'を削除">削除</button>'
+          + '</div>';
+      }).join("");
+    } else {
+      extras += '<p class="field-note" style="margin:0">当日チームが増えたときは、ここにチーム名を直接入力して追加します。</p>';
+    }
+    extras += '<button class="btn" id="btnAddTeam"'+(n>=MAX_TEAMS?" disabled":"")+'>＋ チームを追加</button>'
+      + '</div>';
 
     view.innerHTML =
-    '<div class="wrap-narrow"><div class="setup-grid">'
-    + '<section class="panel"><div class="panel-hd"><h2>参加チーム</h2>'
-      + '<span class="eyebrow">1行に1チーム</span></div><div class="panel-bd">'
-      + (state.seeded ? '<div class="seed-note"><span>初期値</span><span>♠️／♦️／❤️ の組で13チーム分が入っています。参加チームに合わせて書き換えてください。</span></div>' : '')
-      + '<textarea class="teams" id="teamsInput" spellcheck="false" placeholder="チーム名を1行ずつ入力">'+esc(state.raw)+'</textarea>'
-      + '<p class="field-note">改行区切りで貼り付けできます。空行は無視されます。登録できるのは'+MIN_TEAMS+'〜'+MAX_TEAMS+'チームで、4ブロックに均等配分します。</p>'
-      + '</div></section>'
-    + '<aside style="display:grid;gap:1.1rem">'
-      + '<section class="panel"><div class="panel-hd"><h2>ブロック割り</h2></div><div class="panel-bd">'
-        + '<div class="count-row"><span class="count-big">'+n+'</span><span class="count-unit">チーム</span></div>'
-        + '<div class="split-preview">'+sizes.map(function(sz,i){
-            return '<div class="split-cell"><div class="bl">'+LETTERS[i]+'</div><div class="num">'+sz+'</div><div class="unit">チーム</div></div>';
-          }).join("")+'</div>'
-        + (problem ? '<p class="alert">'+esc(problem)+'</p>'
-            : '<p class="field-note" style="margin:0">総当たり '+sizes.reduce(function(a,s){return a+s*(s-1)/2;},0)+' 試合。各ブロック1位の4チームが決勝トーナメントへ進みます。</p>')
-        + (dups.length ? '<p class="alert" style="margin-top:.6rem">同名のチームがあります：'+esc(dups.join("、"))+'</p>' : '')
-      + '</div></section>'
-      + '<section class="panel"><div class="panel-hd"><h2>大会ルール</h2></div><div class="panel-bd">'
-        + '<ul class="rules-list">'
-        + '<li><span class="k">予選</span><span>ブロック内総当たり</span></li>'
-        + '<li><span class="k">引き分け</span><span>なし（同点スコアは入力エラー）</span></li>'
-        + '<li><span class="k">順位</span><span>勝敗数 → 得失点差 → 総得点</span></li>'
-        + '<li><span class="k">同率時</span><span>3項目すべて同じ場合のみ、1位を手動で指定</span></li>'
-        + '<li><span class="k">決勝</span><span>各ブロック1位の4チームを抽選し、準決勝・決勝</span></li>'
-        + '</ul></div></section>'
-    + '</aside></div></div>';
+      '<div class="setup-wrap">'
+      /* 上段：人数とチーム数の選択 ＋ ブロック割り */
+      + '<div class="setup-top">'
+        + '<section class="panel"><div class="panel-hd"><h2>大会の設定</h2>'
+          + '<span class="eyebrow">前日までに決める</span></div><div class="panel-bd setup-controls">'
+          + '<div class="ctrl"><span class="ctrl-lbl">1チームの人数</span>'
+            + '<div class="seg" role="group" aria-label="1チームの人数">'
+            + [3,4].map(function(v){
+                return '<button class="seg-btn'+(su.perTeam===v?" on":"")+'" data-per="'+v+'"'
+                  + (su.perTeam===v?' aria-current="true"':'')+'>'+v+'人</button>';
+              }).join("")
+            + '</div>'
+            + '<span class="ctrl-hint">'+(su.perTeam===3
+                ? "クローバーを抜いた3種類で組みます"
+                : "4種類のマークで組みます")+'</span>'
+          + '</div>'
+          + '<div class="ctrl"><span class="ctrl-lbl">想定チーム数</span>'
+            + '<div class="stepnum">'
+              + '<button class="step-btn" data-count="-1" aria-label="1減らす"'+(su.teamCount<=MIN_TEAMS?" disabled":"")+'>−</button>'
+              + '<span class="stepnum-v">'+su.teamCount+'</span>'
+              + '<button class="step-btn" data-count="1" aria-label="1増やす"'+(su.teamCount>=MAX_TEAMS?" disabled":"")+'>＋</button>'
+            + '</div>'
+            + '<span class="ctrl-hint">カード 1〜'+su.teamCount+' を用意。必要人数は '
+              + (su.teamCount*su.perTeam)+'名</span>'
+          + '</div>'
+        + '</div></section>'
+        + '<section class="panel"><div class="panel-hd"><h2>ブロック割り</h2></div><div class="panel-bd">'
+          + '<div class="count-row"><span class="count-big">'+n+'</span><span class="count-unit">チーム 登録済み</span></div>'
+          + '<div class="split-preview">'+sizes.map(function(sz,i){
+              return '<div class="split-cell"><div class="bl">'+LETTERS[i]+'</div><div class="num">'+sz+'</div><div class="unit">チーム</div></div>';
+            }).join("")+'</div>'
+          + '<p id="splitNote" class="'+(countOutOfRange(n)?"alert":"field-note")+'" style="margin:0">'
+            + esc(splitNote(n, sizes))+'</p>'
+          + '<p id="dupNote" class="alert" style="margin-top:.6rem" hidden></p>'
+        + '</div></section>'
+      + '</div>'
 
-    var ta=document.getElementById("teamsInput");
-    ta.addEventListener("input", function(){
-      state.raw=ta.value; state.seeded=false; save();
-      var nn=parseTeams(state.raw).length, ss=splitSizes(nn);
-      var cb=view.querySelector(".count-big"); if(cb) cb.textContent=nn;
-      var cells=view.querySelectorAll(".split-cell .num");
-      for(var i=0;i<cells.length;i++) cells[i].textContent=ss[i];
-      var btn=document.getElementById("btnGo"); if(btn) btn.disabled = countOutOfRange(nn);
-      var st=document.getElementById("setupMsg");
-      if(st) st.innerHTML = setupMsgHTML(nn, ss);
-    });
+      /* 中段：カードごとのニックネーム入力 */
+      + '<section class="panel"><div class="panel-hd"><h2>ニックネームの入力</h2>'
+        + '<span class="eyebrow">到着順にカードを引いてもらう</span></div>'
+        + '<div class="panel-bd" style="padding:.6rem">'+grid+'</div>'
+        + '<p class="field-note" style="margin:0 1rem 1rem">同じ数字のニックネームが '
+        + suits.map(function(x){return x.name;}).join(" / ")
+        + ' の順につながってチーム名になります。誰も来なかった数字は空のままにしておけば、そのチームは登録されません。</p>'
+      + '</section>'
+
+      /* 下段：追加チーム */
+      + '<section class="panel"><div class="panel-hd"><h2>追加チーム</h2>'
+        + '<span class="eyebrow">急な参加者用</span></div>'
+        + '<div class="panel-bd">'+extras+'</div>'
+      + '</section>'
+      + '</div>';
 
     bar.innerHTML = '<div class="actionbar"><span class="msg" id="setupMsg">'
       + setupMsgHTML(n, sizes)
       + '</span><span class="right">'
-      + '<button class="btn primary" id="btnGo"'+(problem?" disabled":"")+'>シャッフルして予選を組む</button>'
+      + '<button class="btn primary" id="btnGo"'+(countOutOfRange(n)?" disabled":"")+'>シャッフルして予選を組む</button>'
       + '</span></div>';
     document.getElementById("btnGo").addEventListener("click", buildBlocks);
+    document.getElementById("btnAddTeam").addEventListener("click", function(){
+      if(derivedTeams().length>=MAX_TEAMS) return;
+      state.setup.extras.push("");
+      save(); render();
+      var last=document.querySelector('[data-k="x|'+(state.setup.extras.length-1)+'"]');
+      if(last) last.focus();
+    });
+    refreshSetup();
   }
 
   function renderBlock(b){
@@ -1097,8 +1324,8 @@
       ask({
         title:"チーム登録に戻る",
         body: entered
-          ? "現在のブロック分けと、入力済みの "+entered+" 試合の結果は失われます。チーム名の一覧はそのまま残ります。"
-          : "現在のブロック分けは破棄されます。チーム名の一覧はそのまま残ります。",
+          ? "現在のブロック分けと、入力済みの "+entered+" 試合の結果は失われます。ニックネームの入力内容はそのまま残ります。"
+          : "現在のブロック分けは破棄されます。ニックネームの入力内容はそのまま残ります。",
         ok:"戻る", danger:true
       }, function(){
         state.phase="setup"; state.blocks=[]; state.final=null; save(); render(); window.scrollTo(0,0);
@@ -1269,6 +1496,18 @@
   document.addEventListener("input", function(ev){
     var el=ev.target;
     if(!el.dataset || !el.dataset.k) return;
+
+    /* チーム登録画面の文字入力（数字ではないので先に処理する） */
+    if(el.dataset.k.charAt(0)==="n"){
+      var np=el.dataset.k.split("|");
+      state.setup.nicks[np[1]+np[2]] = el.value;
+      save(); refreshSetup(); return;
+    }
+    if(el.dataset.k.charAt(0)==="x"){
+      state.setup.extras[parseInt(el.dataset.k.split("|")[1],10)] = el.value;
+      save(); refreshSetup(); return;
+    }
+
     var raw = el.value.replace(/[^0-9]/g,"").slice(0,3);
     if(raw!==el.value) el.value=raw;
     var val = raw==="" ? null : parseInt(raw,10);
@@ -1288,6 +1527,26 @@
     save(); render();
   });
 
+  document.addEventListener("click", function(ev){
+    var t=ev.target.closest ? ev.target.closest("[data-per],[data-count],[data-delx]") : null;
+    if(!t || state.phase!=="setup" || state.cover) return;
+
+    if(t.hasAttribute("data-per")){
+      state.setup.perTeam = parseInt(t.getAttribute("data-per"),10);
+      save(); render(); return;
+    }
+    if(t.hasAttribute("data-count")){
+      var next = state.setup.teamCount + parseInt(t.getAttribute("data-count"),10);
+      if(next<MIN_TEAMS || next>MAX_TEAMS) return;
+      state.setup.teamCount = next;
+      save(); render(); return;
+    }
+    if(t.hasAttribute("data-delx")){
+      state.setup.extras.splice(parseInt(t.getAttribute("data-delx"),10), 1);
+      save(); render(); return;
+    }
+  });
+
   document.addEventListener("change", function(ev){
     var s=ev.target;
     if(s.dataset && s.dataset.tie){
@@ -1304,10 +1563,10 @@
   document.getElementById("btnReset").addEventListener("click", function(){
     ask({
       title:"最初からやり直す",
-      body:"チーム名・ブロック分け・全試合の結果をすべて消します。この操作は取り消せません。",
+      body:"ニックネーム・チーム名・ブロック分け・全試合の結果をすべて消します。この操作は取り消せません。",
       ok:"すべて消す", danger:true
     }, function(){
-      state={phase:"setup", meetName:"", raw:"", seeded:false, teams:[], blocks:[], final:null,
+      state={phase:"setup", meetName:"", setup:newSetup(), teams:[], blocks:[], final:null,
              pres:false, cover:false};
       save(); render(); window.scrollTo(0,0);
     });
