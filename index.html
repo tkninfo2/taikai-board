@@ -508,20 +508,24 @@
   .app.pres .matches{display:none}
   .app.pres .tiebreak select{display:none}
   .app.pres table.rr{font-size:.92em}
-  .app.pres table.rr th,.app.pres table.rr td{padding:.3rem .22rem}
-  /* チームの識別に必要なのは16文字程度。名前の列に上限を設けて2行までにし
-     （2行で約17文字、超える分は切り詰め）、空いた横幅と縦幅を
-     fitTables が文字サイズに回す。行の高さが一定になるのが肝。 */
-  .app.pres table.rr th.tm{min-width:0;width:7.6em;max-width:7.6em}
+  .app.pres table.rr th,.app.pres table.rr td{padding:.62rem .2rem}
+  /* 名前の列には残り幅をすべて回し（結果としてブロックによって 18〜24文字/行）、
+     2行までで表示する。3行以上に伸びると縦が破綻して文字が極端に小さくなるため、
+     2行で打ち切るのが肝。 */
+  .app.pres table.rr th.tm{min-width:0;width:20em;max-width:20em}
   .app.pres table.rr td.tm{
-    width:7.6em;max-width:7.6em;
-    white-space:normal;line-height:1.22;vertical-align:middle;
+    width:20em;max-width:20em;
+    white-space:normal;line-height:1.28;vertical-align:middle;
   }
   .app.pres table.rr td.tm .tmwrap{
     display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
     overflow:hidden;overflow-wrap:anywhere;
   }
   .app.pres table.rr td.tm .idx{margin-right:.2em}
+  /* 星取表は○×で読むものなので、スコアは細く小さくして脇に添える */
+  .app.pres table.rr .mk{font-size:1.32em;font-weight:700;margin-right:.1em}
+  .app.pres table.rr .mk.l{color:var(--ink-2)}
+  .app.pres table.rr td span.num{font-size:.76em;font-weight:400;color:var(--ink-3)}
   .app.pres table.rr td.tm{padding-left:.45rem}
   .app.pres .thru{margin-left:.25em}
   .app.pres table.rr .col-gf,.app.pres table.rr .col-ga{display:none}
@@ -569,7 +573,7 @@
   .deco{position:fixed;pointer-events:none;z-index:0;user-select:none}
   .deco svg{display:block;width:100%;height:100%}
   .deco-board{right:-7.5rem;bottom:-7.5rem;width:28rem;height:28rem;opacity:var(--deco-op)}
-  .deco-dart{left:-2.5rem;bottom:.5rem;width:18rem;height:18rem;opacity:var(--dart-op)}
+  .deco-dart{left:-.5rem;bottom:.4rem;width:19rem;height:19rem;opacity:var(--dart-op)}
   /* 装飾は z-index:0。本文だけ重ね順を持たせる
      （.topbar は sticky / .actionbar は fixed で既に z-index を持つので触らない） */
   main{position:relative;z-index:1}
@@ -863,9 +867,9 @@
         + '</g>';
     }
     return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
-      + dart(18, 63, -30, 80)
-      + dart(14, 66, -42, 80)
-      + dart(24, 72, -56, 70)
+      + dart(20, 66, -18, 76)
+      + dart(16, 70, -42, 78)
+      + dart(26, 78, -66, 70)
       + '</svg>';
   }
 
