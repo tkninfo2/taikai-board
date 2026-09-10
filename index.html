@@ -47,6 +47,7 @@
     --lose-fg:#6C7789;
     --shadow:0 1px 2px rgba(16,24,40,.05), 0 10px 26px -14px rgba(16,24,40,.22);
     --deco-op:.06;
+    --dart-op:.13;
     --radius:10px;
     color-scheme:light;
   }
@@ -75,8 +76,8 @@
       --lose-bg:#212B41;
       --lose-fg:#8492A9;
       --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 30px -16px rgba(0,0,0,.7);
-    --deco-op:.10;
       --deco-op:.10;
+      --dart-op:.17;
       color-scheme:dark;
     }
   }
@@ -104,6 +105,8 @@
     --lose-bg:#212B41;
     --lose-fg:#8492A9;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 30px -16px rgba(0,0,0,.7);
+    --deco-op:.10;
+    --dart-op:.17;
     color-scheme:dark;
   }
 
@@ -301,6 +304,18 @@
   .rules-list dt,.rules-list .k{color:var(--ink-3);font-size:.92em}
 
   /* ---------- qualifying ---------- */
+  .rankrule{
+    display:flex;flex-wrap:wrap;align-items:center;gap:.35rem;
+    margin:0 0 .75rem;font-size:.82em;color:var(--ink-3);letter-spacing:.02em;
+  }
+  .rankrule b{
+    color:var(--ink-2);font-weight:700;
+    background:var(--surface);border:1px solid var(--line);
+    border-radius:5px;padding:.1rem .45rem;
+  }
+  .rankrule .arw{color:var(--line-strong);font-size:.9em}
+  .app.pres .rankrule{justify-content:center;margin-bottom:.65rem;font-size:.8em}
+
   .blocks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
   @media (max-width:900px){.blocks{grid-template-columns:1fr}}
   .block{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column}
@@ -342,9 +357,9 @@
   .matches{display:flex;flex-direction:column;padding:.35rem .5rem .6rem}
   .match{
     display:grid;
-    grid-template-columns:4.6rem minmax(0,1fr) 3.5rem .8rem 3.5rem minmax(0,1fr);
+    grid-template-columns:4rem minmax(0,1fr) 3.5rem .7rem 3.5rem minmax(0,1fr);
     align-items:center;gap:.35rem;
-    padding:.3rem .35rem;border-radius:7px;
+    padding:.4rem .35rem;border-radius:7px;
   }
   .match + .match{border-top:1px solid var(--line)}
   .match.err{background:var(--danger-soft)}
@@ -353,6 +368,11 @@
   .side.l{justify-content:flex-end;text-align:right}
   .side.r{justify-content:flex-start}
   .tname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.94em}
+  /* 呼び出しに使うので、対戦カードのチーム名は省略せず折り返す */
+  .match .tname{
+    white-space:normal;overflow:visible;text-overflow:clip;
+    overflow-wrap:anywhere;line-height:1.35;
+  }
   .side.won .tname{font-weight:700}
   .side.lost .tname{color:var(--ink-3)}
   .wl{
@@ -383,11 +403,11 @@
 
   /* ---------- bracket ---------- */
   .bracket{
-    display:grid;grid-template-columns:minmax(13rem,1fr) minmax(13rem,1fr) minmax(11rem,.85fr);
+    display:grid;grid-template-columns:minmax(17rem,1fr) minmax(17rem,1fr) minmax(12rem,.6fr);
     gap:0 2.6rem;align-items:center;
-    max-width:58rem;margin:1.4rem auto 0;
+    max-width:71rem;margin:1.4rem auto 0;
   }
-  @media (max-width:800px){.bracket{grid-template-columns:1fr;gap:1rem}}
+  @media (max-width:880px){.bracket{grid-template-columns:1fr;gap:1rem}}
   .col-hd{
     grid-row:1;font-size:.74em;letter-spacing:.18em;color:var(--ink-3);font-weight:700;
     text-align:center;padding-bottom:.5rem;
@@ -404,13 +424,25 @@
     font-size:.75em;letter-spacing:.1em;color:var(--ink-3);font-weight:700;
     padding:.35rem .7rem;border-bottom:1px solid var(--line);background:var(--surface-2);
   }
-  .tie-row{display:grid;grid-template-columns:minmax(0,1fr) 3.8rem;align-items:center;gap:.5rem;padding:.45rem .7rem}
+  .tie-row{
+    display:grid;grid-template-columns:minmax(0,1fr) 3.8rem;
+    align-items:center;gap:.5rem;padding:.5rem .7rem;
+  }
   .tie-row + .tie-row{border-top:1px solid var(--line)}
-  .tie-row .tname{font-size:1em}
+  /* 次の試合を呼び出せるよう、チーム名は省略せず折り返して全部見せる */
+  .tie-row .tname{
+    font-size:1em;min-width:0;
+    white-space:normal;overflow:visible;text-overflow:clip;
+    overflow-wrap:anywhere;line-height:1.45;
+  }
   .tie-row.won{background:var(--brand-soft)}
   .tie-row.won .tname{font-weight:700;color:var(--ink)}
   .tie-row.lost .tname{color:var(--ink-3)}
-  .tie-row .seedmark{font-size:.72em;color:var(--ink-3);margin-right:.35rem;font-family:"Oswald",sans-serif}
+  /* 「Aブロック1位」は名前の上に置き、名前が横幅をすべて使えるようにする */
+  .tie-row .seedmark{
+    display:block;font-size:.7em;color:var(--ink-3);
+    margin:0 0 .1rem;font-family:"Oswald",sans-serif;letter-spacing:.02em;
+  }
   .tie.pending .tie-row .tname{color:var(--ink-3);font-style:normal}
 
   .champ{
@@ -420,14 +452,18 @@
   .champ .lbl{font-size:.74em;letter-spacing:.28em;color:var(--gold);font-weight:700}
   .champ .nm{
     font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:1.6em;line-height:1.35;
-    margin-top:.3rem;color:var(--ink);word-break:break-word;
+    margin-top:.3rem;color:var(--ink);overflow-wrap:anywhere;
   }
+  /* 優勝チームはニックネームを1人ずつ改行して、全員の名前を出す */
+  .champ .nm.multi{font-size:1.32em;line-height:1.4}
+  .champ .nm .nick-line{display:block}
+  .champ .nm .nick-line + .nick-line{margin-top:.12em}
   .champ.empty{background:var(--surface-2);border-style:dashed;border-color:var(--line-strong)}
   .champ.empty .lbl{color:var(--ink-3)}
   .champ.empty .nm{color:var(--ink-3);font-size:1.1em;font-weight:700}
 
   /* connectors */
-  @media (min-width:801px){
+  @media (min-width:881px){
     .semis::after,.finalslot::before{content:"";position:absolute;pointer-events:none}
     .semis::after{
       right:-1.3rem;top:25%;bottom:25%;width:1.3rem;
@@ -472,10 +508,27 @@
   .app.pres .matches{display:none}
   .app.pres .tiebreak select{display:none}
   .app.pres table.rr{font-size:.92em}
-  .app.pres table.rr th,.app.pres table.rr td{padding:.46rem .32rem}
-  .app.pres table.rr th.tm{min-width:6rem}
+  .app.pres table.rr th,.app.pres table.rr td{padding:.3rem .22rem}
+  /* チームの識別に必要なのは16文字程度。名前の列に上限を設けて2行までにし
+     （2行で約17文字、超える分は切り詰め）、空いた横幅と縦幅を
+     fitTables が文字サイズに回す。行の高さが一定になるのが肝。 */
+  .app.pres table.rr th.tm{min-width:0;width:7.6em;max-width:7.6em}
+  .app.pres table.rr td.tm{
+    width:7.6em;max-width:7.6em;
+    white-space:normal;line-height:1.22;vertical-align:middle;
+  }
+  .app.pres table.rr td.tm .tmwrap{
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+    overflow:hidden;overflow-wrap:anywhere;
+  }
+  .app.pres table.rr td.tm .idx{margin-right:.2em}
+  .app.pres table.rr td.tm{padding-left:.45rem}
+  .app.pres .thru{margin-left:.25em}
   .app.pres table.rr .col-gf,.app.pres table.rr .col-ga{display:none}
-  .app.pres .block-hd{padding:.55rem .9rem}
+  .app.pres .block-hd{padding:.38rem .8rem}
+  .app.pres .block-letter{font-size:1.02em}
+  .app.pres .block-hd h2{font-size:.92em}
+  .app.pres .prog{font-size:.78em}
   .app.pres .blocks{gap:.85rem}
   @media (min-width:640px){
     .app.pres .blocks{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -516,7 +569,7 @@
   .deco{position:fixed;pointer-events:none;z-index:0;user-select:none}
   .deco svg{display:block;width:100%;height:100%}
   .deco-board{right:-7.5rem;bottom:-7.5rem;width:28rem;height:28rem;opacity:var(--deco-op)}
-  .deco-dart{left:-2.5rem;bottom:.5rem;width:15rem;height:15rem;opacity:calc(var(--deco-op) * .85)}
+  .deco-dart{left:-2.5rem;bottom:.5rem;width:18rem;height:18rem;opacity:var(--dart-op)}
   /* 装飾は z-index:0。本文だけ重ね順を持たせる
      （.topbar は sticky / .actionbar は fixed で既に z-index を持つので触らない） */
   main{position:relative;z-index:1}
@@ -796,7 +849,27 @@
     return svg+'</svg>';
   }
 
-  /* ダーツ（矢）。body=バレル、flight=フライトの色 */
+  /* 3本のダーツ。矢先を1か所に寄せ、フライトを扇状に広げてグルーピングを出す。
+     矢先を原点、胴体を +x 方向に描いた形を、位置と角度と長さを変えて3回置く。 */
+  function dartsSVG(body, flight, flightHi){
+    function dart(tx, ty, angle, len){
+      var k = len/93;
+      return '<g transform="translate('+tx+' '+ty+') rotate('+angle+') scale('+k+')">'
+        + '<polygon points="0,0 17,-2.9 17,2.9" fill="'+body+'"/>'
+        + '<rect x="16" y="-4.6" width="28" height="9.2" rx="4" fill="'+body+'"/>'
+        + '<rect x="43" y="-2" width="20" height="4" fill="'+body+'"/>'
+        + '<polygon points="61,0 93,-14.5 93,14.5" fill="'+flight+'"/>'
+        + '<polygon points="61,0 93,-6.5 93,6.5" fill="'+flightHi+'"/>'
+        + '</g>';
+    }
+    return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
+      + dart(18, 63, -30, 80)
+      + dart(14, 66, -42, 80)
+      + dart(24, 72, -56, 70)
+      + '</svg>';
+  }
+
+  /* ダーツ（矢）1本。body=バレル、flight=フライトの色 */
   function dartSVG(body, flight, flightHi, angle){
     return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
       + '<g transform="rotate('+(angle==null?-38:angle)+' 50 50)">'
@@ -933,6 +1006,9 @@
   function filled(m){ return m.sa!=null || m.sb!=null; }
 
   /* ---------- standings ---------- */
+  /* 順位は 勝ち数 → 得失点差 → 直接対決の結果 の順に見る。
+     3チーム以上が勝ち数・得失点差で並び、かつ直接対決が一巡（AがBに勝ち、BがCに勝ち、
+     CがAに勝つ）している場合だけ決まらないので、そのときは1位を手で指定してもらう。 */
   function standings(block){
     var stats={};
     block.teamIds.forEach(function(id){
@@ -945,15 +1021,43 @@
       if(m.sa>m.sb){A.w++;B.l++;} else {B.w++;A.l++;}
     });
     var rows = block.teamIds.map(function(id){
-      var s=stats[id]; s.dif=s.gf-s.ga; return s;
+      var s=stats[id]; s.dif=s.gf-s.ga; s.h2h=null; return s;
     });
-    rows.sort(function(x,y){
-      return (y.w-x.w) || (y.dif-x.dif) || (y.gf-x.gf);
-    });
-    // teams tied with the leader on every criterion
+
+    /* group の中だけで戦った試合の勝ち数（直接対決） */
+    function h2hWins(id, group){
+      var n=0;
+      block.matches.forEach(function(m){
+        if(!done(m)) return;
+        if(group.indexOf(m.a)<0 || group.indexOf(m.b)<0) return;
+        if((m.a===id && m.sa>m.sb) || (m.b===id && m.sb>m.sa)) n++;
+      });
+      return n;
+    }
+
+    rows.sort(function(x,y){ return (y.w-x.w) || (y.dif-x.dif); });
+
+    /* 勝ち数・得失点差が同じ塊ごとに、直接対決の勝ち数で並べ替える */
+    var ordered=[], i=0;
+    while(i<rows.length){
+      var j=i+1;
+      while(j<rows.length && rows[j].w===rows[i].w && rows[j].dif===rows[i].dif) j++;
+      var group=rows.slice(i,j);
+      if(group.length>1){
+        var gids=group.map(function(r){ return r.id; });
+        group.forEach(function(r){ r.h2h=h2hWins(r.id, gids); });
+        group.sort(function(x,y){ return y.h2h-x.h2h; });
+      }
+      ordered=ordered.concat(group);
+      i=j;
+    }
+    rows=ordered;
+
+    /* 1位がまだ並んでいるか（勝ち数・得失点差・直接対決すべて同じ） */
     var tied=[rows[0].id];
-    for(var i=1;i<rows.length;i++){
-      if(rows[i].w===rows[0].w && rows[i].dif===rows[0].dif && rows[i].gf===rows[0].gf) tied.push(rows[i].id);
+    for(var k=1;k<rows.length;k++){
+      if(rows[k].w===rows[0].w && rows[k].dif===rows[0].dif
+         && (rows[k].h2h||0)===(rows[0].h2h||0)) tied.push(rows[k].id);
       else break;
     }
     var needPick = tied.length>1;
@@ -1238,8 +1342,9 @@
     order.forEach(function(id,i){
       var s=statOf[id], isFirst = st.winner===id;
       html += '<tr'+(isFirst?' class="first"':'')+'>'
-        + '<td class="tm"><span class="idx">'+CIRCLED[i]+'</span>'+esc(teamName(id))
-        + (isFirst?'<span class="thru">通過</span>':'')+'</td>';
+        + '<td class="tm"><span class="tmwrap"><span class="idx">'+CIRCLED[i]+'</span>'
+        + esc(teamName(id))
+        + (isFirst?'<span class="thru">通過</span>':'')+'</span></td>';
       order.forEach(function(oid,j){
         if(i===j){ html += '<td class="cell-self">■</td>'; return; }
         var m = b.matches.filter(function(x){
@@ -1262,8 +1367,8 @@
     if(st.needPick && st.allPlayed){
       html += '<div class="tiebreak"><span>'
         + (state.pres
-            ? esc(st.tied.map(teamName).join("・")) + ' が勝敗数・得失点差・総得点で並び、1位を決定中です。'
-            : '勝敗数・得失点差・総得点がすべて同じため、1位を指定してください。')
+            ? esc(st.tied.map(teamName).join("・")) + ' が勝ち数・得失点差・直接対決で並び、1位を決定中です。'
+            : '勝ち数・得失点差が同じで、直接対決も一巡しているため決まりません。1位を指定してください。')
         + '</span>'
         + '<select data-tie="'+b.id+'"><option value="">選択…</option>'
         + st.tied.map(function(id){ return '<option value="'+id+'">'+esc(teamName(id))+'</option>'; }).join("")
@@ -1298,7 +1403,10 @@
   }
 
   function renderQualifying(){
-    view.innerHTML = '<div class="blocks">'+state.blocks.map(renderBlock).join("")+'</div>';
+    view.innerHTML =
+      '<p class="rankrule">順位の決め方：<b>勝ち数</b><span class="arw">→</span>'
+      + '<b>得失点差</b><span class="arw">→</span><b>直接対決の結果</b></p>'
+      + '<div class="blocks">'+state.blocks.map(renderBlock).join("")+'</div>';
 
     var ready=allQualifyingDone();
     var remain=0, needPick=0;
@@ -1370,6 +1478,17 @@
     bar.innerHTML = "";
   }
 
+  /* 優勝チーム名。"/" 区切りのニックネームを1行ずつに割って全員分表示する */
+  function champNameHTML(name){
+    var parts = String(name).split("/")
+      .map(function(x){ return x.trim(); })
+      .filter(function(x){ return x.length>0; });
+    if(parts.length<2) return '<div class="nm">'+esc(name)+'</div>';
+    return '<div class="nm multi">'
+      + parts.map(function(p){ return '<span class="nick-line">'+esc(p)+'</span>'; }).join("")
+      + '</div>';
+  }
+
   function renderFinal(){
     syncFinalMatch();
     var f=state.final, seeds=f.src;
@@ -1388,7 +1507,7 @@
       + '<div class="champslot">'
         + (champ ? '<div class="champ"><div class="champ-dart">'
                      + dartSVG("var(--gold)","var(--brand)","var(--gold-line)",-32)
-                   + '</div><div class="lbl">CHAMPION</div><div class="nm">'+esc(teamName(champ))+'</div></div>'
+                   + '</div><div class="lbl">CHAMPION</div>'+champNameHTML(teamName(champ))+'</div>'
                  : '<div class="champ empty"><div class="lbl">CHAMPION</div><div class="nm">決勝の結果待ち</div></div>')
       + '</div></div>'
       + '<div class="thanks"><span class="rule"></span><p>'+esc(THANKS)+'</p></div>';
@@ -1588,7 +1707,7 @@
 
   /* 背景のダーツ盤とダーツを描く（一度だけ） */
   document.getElementById("decoBoard").innerHTML = dartboardSVG();
-  document.getElementById("decoDart").innerHTML  = dartSVG("var(--ink-2)","var(--brand)","var(--gold)",-38);
+  document.getElementById("decoDart").innerHTML  = dartsSVG("var(--ink-2)","var(--brand)","var(--gold)");
 
   /* オフラインで動作中であることを表示（テザリングを切ったまま使えるのを確認できる） */
   function syncOnline(){
