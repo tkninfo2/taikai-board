@@ -133,6 +133,14 @@
   }
   .brandmark{display:flex;align-items:baseline;gap:.6rem;flex:0 0 auto}
   .brandmark h1{font-size:1.18em;letter-spacing:.02em}
+  /* iPadで最新版かどうかを確かめるためのバージョン表記 */
+  .verbadge{
+    font-family:"Oswald",sans-serif!important;font-weight:600;
+    font-size:1.02em;letter-spacing:.05em;line-height:1.5;
+    color:var(--brand);background:var(--brand-soft);
+    border:1px solid var(--brand-line);border-radius:6px;
+    padding:.06rem .5rem;
+  }
   .brandmark .sub{font-size:.72em;color:var(--ink-3);letter-spacing:.14em}
   .meet-name{
     font-family:"Shippori Mincho B1",serif;font-weight:700;font-size:1em;
@@ -515,12 +523,17 @@
   .app.pres table.rr th.tm{min-width:0;width:20em;max-width:20em}
   .app.pres table.rr td.tm{
     width:20em;max-width:20em;
-    white-space:normal;line-height:1.28;vertical-align:middle;
+    white-space:normal;line-height:1.85;vertical-align:middle;
+    font-weight:400;
   }
+  /* チーム名が文字の塊になって星取表の視認を邪魔するので、
+     ひとまわり小さく・淡く・字間を広げて、○×より一歩引かせる */
   .app.pres table.rr td.tm .tmwrap{
     display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
     overflow:hidden;overflow-wrap:anywhere;
+    font-size:.84em;letter-spacing:.06em;color:var(--ink-2);
   }
+  .app.pres table.rr tr.first td.tm .tmwrap{font-weight:600;color:var(--ink)}
   .app.pres table.rr td.tm .idx{margin-right:.2em}
   /* 星取表は○×で読むものなので、スコアは細く小さくして脇に添える */
   .app.pres table.rr .mk{font-size:1.32em;font-weight:700;margin-right:.1em}
@@ -643,7 +656,7 @@
   <header class="topbar">
     <div class="brandmark">
       <span class="logo-slot" id="logoSlot"><img class="logo logo-mark" id="logoMark" alt="ツバサ ありがと会"></span>
-      <h1>大会ボード</h1>
+      <h1 class="verbadge" id="verBadge"></h1>
       <span class="sub">DARTS</span>
       <input class="meet-name" id="meetName" aria-label="大会名" placeholder="大会名">
     </div>
@@ -674,6 +687,9 @@
   var LOGO_SRC = "logo.jpg";
 
   var THANKS = "ツバサ　お疲れさま＆ありがとう！";
+
+  /* 画面左上に出すバージョン。sw.js の CACHE の番号と必ず揃えること。 */
+  var APP_VERSION = "v7";
 
   /* トランプのマーク。チーム名はこの順にニックネームを "/" で繋ぐ。
      1チーム3名のときはクローバーを使わない（カードから抜いておく運用）。 */
@@ -1710,6 +1726,7 @@
   if(btnData) btnData.addEventListener("click", dataDialog);
 
   /* 背景のダーツ盤とダーツを描く（一度だけ） */
+  document.getElementById("verBadge").textContent = APP_VERSION;
   document.getElementById("decoBoard").innerHTML = dartboardSVG();
   document.getElementById("decoDart").innerHTML  = dartsSVG("var(--ink-2)","var(--brand)","var(--gold)");
 
