@@ -135,11 +135,9 @@
   .brandmark h1{font-size:1.18em;letter-spacing:.02em}
   /* iPadで最新版かどうかを確かめるためのバージョン表記 */
   .verbadge{
-    font-family:"Oswald",sans-serif!important;font-weight:600;
-    font-size:1.02em;letter-spacing:.05em;line-height:1.5;
-    color:var(--brand);background:var(--brand-soft);
-    border:1px solid var(--brand-line);border-radius:6px;
-    padding:.06rem .5rem;
+    font-family:"Oswald",sans-serif!important;font-weight:400;
+    font-size:.98em;letter-spacing:.06em;line-height:1.5;
+    color:var(--ink-3);background:none;border:none;padding:0;
   }
   .brandmark .sub{font-size:.72em;color:var(--ink-3);letter-spacing:.14em}
   .meet-name{
@@ -452,6 +450,12 @@
     margin:0 0 .1rem;font-family:"Oswald",sans-serif;letter-spacing:.02em;
   }
   .tie.pending .tie-row .tname{color:var(--ink-3);font-style:normal}
+  .tie-row .tnwrap{display:block;overflow-wrap:anywhere}
+  /* 大画面では行の高さを揃えるので、はみ出しは隠す（高さは JS が最大値に合わせる）。
+     1行のチームは箱の中で縦中央に置き、スコアの位置と目線を合わせる。 */
+  .app.pres .tie-row .tnwrap{
+    overflow:hidden;display:flex;flex-direction:column;justify-content:center;
+  }
 
   .champ{
     text-align:center;padding:1.1rem .9rem;border-radius:var(--radius);
@@ -530,8 +534,10 @@
      ひとまわり小さく・淡く・字間を広げて、○×より一歩引かせる */
   .app.pres table.rr td.tm .tmwrap{
     display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+    -webkit-box-pack:center;
     overflow:hidden;overflow-wrap:anywhere;
     font-size:.84em;letter-spacing:.06em;color:var(--ink-2);
+    font-weight:700;
   }
   .app.pres table.rr tr.first td.tm .tmwrap{font-weight:600;color:var(--ink)}
   .app.pres table.rr td.tm .idx{margin-right:.2em}
@@ -689,7 +695,7 @@
   var THANKS = "ツバサ　お疲れさま＆ありがとう！";
 
   /* 画面左上に出すバージョン。sw.js の CACHE の番号と必ず揃えること。 */
-  var APP_VERSION = "v7";
+  var APP_VERSION = "v8";
 
   /* トランプのマーク。チーム名はこの順にニックネームを "/" で繋ぐ。
      1チーム3名のときはクローバーを使わない（カードから抜いておく運用）。 */
@@ -1474,7 +1480,7 @@
       return '<div class="tie-row '+cls+'">'
         + '<span class="tname">'
           + (seeds && id && seeds[id] ? '<span class="seedmark">'+seeds[id]+'ブロック1位</span>' : '')
-          + esc(id?teamName(id):"勝者未定")+'</span>'
+          + '<span class="tnwrap">'+esc(id?teamName(id):"勝者未定")+'</span></span>'
         + '<input class="score" inputmode="numeric" maxlength="3" placeholder="–" aria-label="得点"'
           + (pending?" disabled":"")
           + ' data-k="f|'+m.id+'|'+side+'" value="'+(sc==null?"":sc)+'">'
@@ -1560,6 +1566,20 @@
   /* 大画面モードでは横スクロールできないので、星取表が枠に収まる文字サイズまで縮める。
      4チームのブロックは列が多く、3桁スコアだとはみ出すため。
      4ブロックで見た目を揃えるよう、いちばん厳しいブロックのサイズを全体に適用する。 */
+  /* 1行のチームと2行のチームが混ざると行の高さがばらつくので、
+     いちばん高いものに全部を合わせる。全チームが1行なら1行分で揃う。 */
+  function equalizeHeights(sel){
+    var els=[].slice.call(document.querySelectorAll(sel));
+    els.forEach(function(el){ el.style.height=""; });
+    if(!state.pres || !els.length) return;
+    var max=0;
+    els.forEach(function(el){
+      var h=el.getBoundingClientRect().height;
+      if(h>max) max=h;
+    });
+    if(max>0) els.forEach(function(el){ el.style.height=max+"px"; });
+  }
+
   function fitTables(){
     var MIN=9, MAX=30, STEP=0.5;
     var boxes=[].slice.call(document.querySelectorAll(".block .rr-scroll"));
@@ -1598,10 +1618,12 @@
       });
     }
     apply(best);
+    equalizeHeights(".block td.tm .tmwrap");
     var guard=0;
     while(document.documentElement.scrollHeight > window.innerHeight + 1
           && best>MIN && guard++<80){
       best-=STEP; apply(best);
+      equalizeHeights(".block td.tm .tmwrap");
     }
   }
 
@@ -1629,6 +1651,7 @@
       if(el){ el.focus(); if(sel && el.setSelectionRange){ try{ el.setSelectionRange(sel[0],sel[1]); }catch(e){} } }
     }
     fitTables();
+    equalizeHeights(".tie-row .tnwrap");
   }
 
   /* ---------- input wiring (delegated) ---------- */

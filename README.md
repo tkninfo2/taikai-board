@@ -80,12 +80,12 @@ iOS の**アクセスガイド**を使うと、このアプリから抜け出せ
 
 ```js
 // sw.js
-const CACHE = "block4-board-v7";   //  ← v8, v9 … と上げる
+const CACHE = "block4-board-v8";   //  ← v9, v10 … と上げる
 ```
 
 ```js
 // index.html
-var APP_VERSION = "v7";            //  ← 同じ番号にする
+var APP_VERSION = "v8";            //  ← 同じ番号にする
 ```
 
 `sw.js` 側を上げると次回の起動時に古いキャッシュが破棄されます。`index.html` 側の番号は
