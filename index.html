@@ -677,9 +677,39 @@
     font-variant-numeric:tabular-nums;color:var(--brand);white-space:nowrap;
   }
   .ch-price .yen{font-size:.82em}
-  .ch-stock{
-    font-size:.78em;color:var(--ink-3);white-space:nowrap;
-    display:inline-flex;align-items:center;gap:.25rem;
+  /* 編集モードのトグル：品名そのものがボタンになる */
+  .dchip{
+    font-family:inherit;font-size:.92em;font-weight:500;color:var(--ink-2);
+    background:var(--surface);border:1px solid var(--line-strong);
+    border-radius:7px;padding:.28rem .62rem;min-height:38px;
+  }
+  .dchip:hover{background:var(--surface-2);color:var(--ink)}
+  .dchip:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+  .dchip.on{
+    background:var(--danger-soft);border-color:var(--danger);color:var(--danger);
+    text-decoration:line-through;text-decoration-thickness:1px;
+  }
+  /* シャンパン行の SOLD OUT トグル */
+  .btn-out{
+    font-family:"Oswald",sans-serif;font-size:.72em;font-weight:600;letter-spacing:.1em;
+    color:var(--ink-3);background:var(--surface);
+    border:1px solid var(--line-strong);border-radius:5px;
+    padding:.2rem .5rem;min-height:34px;white-space:nowrap;flex:0 0 auto;
+  }
+  .btn-out:hover{background:var(--surface-2);color:var(--ink-2)}
+  .btn-out:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+  .btn-out.on{background:var(--danger);border-color:var(--danger);color:var(--danger-fg)}
+
+  /* 大画面モードの品切れ表示。取り消し線は品名にだけ掛ける
+     （親に掛けるとスタンプの上まで線が走る） */
+  ul.menu-list li.out .dn{
+    color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1px;
+  }
+  .stamp-s{
+    font-family:"Oswald",sans-serif;font-weight:700;font-size:.66em;letter-spacing:.1em;
+    color:var(--danger);border:1.5px solid var(--danger);border-radius:3px;
+    padding:0 .25em;margin-left:.35em;display:inline-block;
+    transform:rotate(-4deg);
   }
   .ch.soldout .ch-name{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1px}
   .ch.soldout .ch-price{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1px}
@@ -690,15 +720,14 @@
     white-space:nowrap;flex:0 0 auto;
   }
 
-  input.pricein,input.stockin{
+  input.pricein{
     font-family:"Oswald",sans-serif;font-variant-numeric:tabular-nums;font-weight:600;
     text-align:right;color:var(--ink);background:var(--surface-2);
     border:1px solid var(--line-strong);border-radius:6px;
     min-height:36px;padding:.1rem .35rem;font-size:1em;
   }
   input.pricein{width:4.6em}
-  input.stockin{width:2.6em;text-align:center;font-weight:500;font-size:.95em;min-height:32px}
-  input.pricein:focus,input.stockin:focus{outline:2px solid var(--brand);outline-offset:1px;background:var(--surface)}
+  input.pricein:focus{outline:2px solid var(--brand);outline-offset:1px;background:var(--surface)}
 
   /* 大画面モードではメニューを一段大きく、ゆったり見せる */
   .app.pres .cover-right{gap:1.5rem}
@@ -709,6 +738,7 @@
   .app.pres .ch-name{font-size:1.15em}
   .app.pres .ch-price{font-size:1.28em}
   .app.pres .ch-stamp{font-size:.8em}
+  .app.pres .stamp-s{font-size:.7em}
   .app.pres .menu-top{font-size:1em}
   .cover-noimg{
     display:grid;place-items:center;gap:.6rem;
@@ -776,7 +806,7 @@
   var THANKS = "ツバサ　お疲れさま＆ありがとう！";
 
   /* 画面左上に出すバージョン。sw.js の CACHE の番号と必ず揃えること。 */
-  var APP_VERSION = "v9";
+  var APP_VERSION = "v10";
 
   /* ---------- ドリンクメニュー ---------- */
   /* 種類は固定。金額だけ変更できるようにし、シャンパンは残り本数も持つ。 */
@@ -790,10 +820,22 @@
     {key:"ice",       name:"モエ・エ・シャンドン　アイス",   price:18000}
   ];
 
+  /* 品切れは種類ごとのフラグで持つ。キーは
+     アルコール a0..a5 / ソフトドリンク s0..s3 / シャンパンは c.key */
+  function alcKey(i){ return "a"+i; }
+  function softKey(i){ return "s"+i; }
+
   function newDrinks(){
     var champ={};
-    CHAMPAGNES.forEach(function(c){ champ[c.key]={price:c.price, stock:null}; });
-    return {alc:500, soft:500, champ:champ};
+    CHAMPAGNES.forEach(function(c){ champ[c.key]={price:c.price}; });
+    return {alc:500, soft:500, champ:champ, out:{}};
+  }
+  function isOut(key){ return !!(state.drinks.out && state.drinks.out[key]); }
+  function toggleOut(key){
+    if(!state.drinks.out) state.drinks.out={};
+    if(state.drinks.out[key]) delete state.drinks.out[key];
+    else state.drinks.out[key]=true;
+    return isOut(key);
   }
 
   /* トランプのマーク。チーム名はこの順にニックネームを "/" で繋ぐ。
@@ -833,8 +875,13 @@
   /* ドリンクの設定は後から足したので、無ければ既定値を入れる */
   if(!state.drinks) state.drinks = newDrinks();
   if(!state.drinks.champ) state.drinks.champ = newDrinks().champ;
+  if(!state.drinks.out) state.drinks.out = {};
   CHAMPAGNES.forEach(function(c){
-    if(!state.drinks.champ[c.key]) state.drinks.champ[c.key]={price:c.price, stock:null};
+    var cs = state.drinks.champ[c.key];
+    if(!cs){ state.drinks.champ[c.key]={price:c.price}; return; }
+    /* 旧バージョンの「残り0本」を品切れフラグに移す */
+    if(cs.stock === 0) state.drinks.out[c.key] = true;
+    delete cs.stock;
   });
   delete state.raw; delete state.seeded;
 
@@ -1073,8 +1120,12 @@
       if(!state.setup.teamCount) state.setup.teamCount = 12;
       if(!state.drinks) state.drinks = newDrinks();
       if(!state.drinks.champ) state.drinks.champ = newDrinks().champ;
+      if(!state.drinks.out) state.drinks.out = {};
       CHAMPAGNES.forEach(function(c){
-        if(!state.drinks.champ[c.key]) state.drinks.champ[c.key]={price:c.price, stock:null};
+        var cs0 = state.drinks.champ[c.key];
+        if(!cs0){ state.drinks.champ[c.key]={price:c.price}; return; }
+        if(cs0.stock === 0) state.drinks.out[c.key] = true;
+        delete cs0.stock;
       });
       state.pres = false; state.cover = false;
       save(); render(); window.scrollTo(0,0);
@@ -1627,15 +1678,25 @@
                 : esc(yen(price)))
         + '</span></div>';
     }
-    function nameList(arr){
+    /* 品名の一覧。編集モードはタップで品切れを切り替えるボタン、
+       大画面モードは取り消し線と SOLD OUT の表示だけ。 */
+    function nameList(arr, keyFn){
       return '<ul class="menu-list">'
-        + arr.map(function(n){ return '<li>'+esc(n)+'</li>'; }).join("")
+        + arr.map(function(n,i){
+            var k=keyFn(i), out=isOut(k);
+            if(edit){
+              return '<li><button class="dchip'+(out?" on":"")+'" data-out="'+k+'"'
+                + ' aria-pressed="'+(out?"true":"false")+'">'+esc(n)+'</button></li>';
+            }
+            return '<li'+(out?' class="out"':'')+'><span class="dn">'+esc(n)+'</span>'
+              + (out?'<span class="stamp-s">SOLD OUT</span>':'')+'</li>';
+          }).join("")
         + '</ul>';
     }
 
     var champRows = CHAMPAGNES.map(function(c){
-      var st = d.champ[c.key] || {price:c.price, stock:null};
-      var out = st.stock === 0;
+      var st = d.champ[c.key] || {price:c.price};
+      var out = isOut(c.key);
       return '<li class="ch'+(out?" soldout":"")+'">'
         + '<span class="ch-name">'+esc(c.name)+'</span>'
         + (out && !edit ? '<span class="ch-stamp">SOLD OUT</span>' : '')
@@ -1644,10 +1705,8 @@
                   : esc(yen(st.price)))
         + '</span>'
         + (edit
-            ? '<span class="ch-stock">残り'
-              + '<input class="stockin" inputmode="numeric" maxlength="2" data-k="d|s|'+c.key+'"'
-              + ' aria-label="'+esc(c.name)+'の残り本数" value="'+(st.stock==null?"":st.stock)+'">'
-              + '本</span>'
+            ? '<button class="btn-out'+(out?" on":"")+'" data-out="'+c.key+'"'
+              + ' aria-pressed="'+(out?"true":"false")+'">SOLD OUT</button>'
             : '')
         + '</li>';
     }).join("");
@@ -1662,16 +1721,19 @@
       + '</div>'
       + '<div class="cover-right">'
         + '<div class="menu-top">DRINK MENU</div>'
-        + '<section class="menu-sec">'+allRow("アルコール", d.alc, "alc")+nameList(DRINK_ALC)+'</section>'
-        + '<section class="menu-sec">'+allRow("ソフトドリンク", d.soft, "soft")+nameList(DRINK_SOFT)+'</section>'
+        + '<section class="menu-sec">'+allRow("アルコール", d.alc, "alc")+nameList(DRINK_ALC, alcKey)+'</section>'
+        + '<section class="menu-sec">'+allRow("ソフトドリンク", d.soft, "soft")+nameList(DRINK_SOFT, softKey)+'</section>'
         + '<section class="menu-sec"><div class="menu-hd"><h3>シャンパン</h3></div>'
           + '<ul class="menu-champ">'+champRows+'</ul></section>'
       + '</div>'
       + '</div>';
 
+    var outCount = Object.keys(state.drinks.out || {}).length;
     bar.innerHTML = edit
-      ? '<div class="actionbar"><span class="msg">金額と残り本数を入力できます。'
-        + '<b>残り0本</b>にしたシャンパンは、大画面表示で SOLD OUT になります。</span>'
+      ? '<div class="actionbar"><span class="msg">'
+        + '品名をタップすると <b>SOLD OUT</b> に切り替わります（金額も変更できます）。'
+        + (outCount ? ' 現在 <b>'+outCount+'</b> 品が SOLD OUT。' : '')
+        + '</span>'
         + '<span class="right"><button class="btn gold" id="btnPres3">▣ 大画面で表示</button></span></div>'
       : "";
     if(edit){
@@ -1845,24 +1907,15 @@
       save(); refreshSetup(); return;
     }
 
-    /* ドリンクの金額と残り本数（数字のみ） */
+    /* ドリンクの金額（数字のみ） */
     if(el.dataset.k.charAt(0)==="d"){
       var dp=el.dataset.k.split("|");
-      var lim = dp[1]==="s" ? 2 : 6;
-      var dv = el.value.replace(/[^0-9]/g,"").slice(0,lim);
+      var dv = el.value.replace(/[^0-9]/g,"").slice(0,6);
       if(dv!==el.value) el.value=dv;
       var num = dv==="" ? null : parseInt(dv,10);
-      if(dp[1]==="alc" || dp[1]==="soft"){
-        state.drinks[dp[1]] = num;
-      } else if(dp[1]==="p"){
-        state.drinks.champ[dp[2]].price = num;
-      } else if(dp[1]==="s"){
-        state.drinks.champ[dp[2]].stock = num;
-      }
+      if(dp[1]==="alc" || dp[1]==="soft") state.drinks[dp[1]] = num;
+      else if(dp[1]==="p") state.drinks.champ[dp[2]].price = num;
       save();
-      /* 入力中に作り直すとフォーカスが飛ぶので、表示だけ差し替える */
-      var row = el.closest ? el.closest(".ch") : null;
-      if(row) row.classList.toggle("soldout", num===0 && dp[1]==="s");
       return;
     }
 
@@ -1886,6 +1939,25 @@
   });
 
   document.addEventListener("click", function(ev){
+    /* 表紙の編集モードで SOLD OUT を切り替える。
+       作り直すとロゴが再読み込みされてちらつくので、見た目だけ差し替える。 */
+    var o=ev.target.closest ? ev.target.closest("[data-out]") : null;
+    if(o && state.cover && !state.pres){
+      var nowOut=toggleOut(o.getAttribute("data-out"));
+      save();
+      o.classList.toggle("on", nowOut);
+      o.setAttribute("aria-pressed", nowOut?"true":"false");
+      var chRow=o.closest(".ch");
+      if(chRow) chRow.classList.toggle("soldout", nowOut);
+      var msg=document.querySelector(".actionbar .msg");
+      if(msg){
+        var cnt=Object.keys(state.drinks.out||{}).length;
+        msg.innerHTML = '品名をタップすると <b>SOLD OUT</b> に切り替わります（金額も変更できます）。'
+          + (cnt ? ' 現在 <b>'+cnt+'</b> 品が SOLD OUT。' : '');
+      }
+      return;
+    }
+
     var t=ev.target.closest ? ev.target.closest("[data-per],[data-count],[data-delx]") : null;
     if(!t || state.phase!=="setup" || state.cover) return;
 

@@ -3,7 +3,7 @@
    アプリを更新したら CACHE の数字を上げること（古いキャッシュは自動で削除される）。
    index.html の APP_VERSION と同じ番号にしておくと、画面左上の表記で確認できる。 */
 
-const CACHE = "block4-board-v9";
+const CACHE = "block4-board-v10";
 
 /* アプリ本体。ここが揃っていればオフラインで起動できる。 */
 const SHELL = [
