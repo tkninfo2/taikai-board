@@ -614,24 +614,105 @@
   .logo-mark{width:2.35em;height:2.35em;flex:0 0 auto}
   .logo-slot[hidden]{display:none}
 
-  /* ---------- 表紙（大画面モード） ---------- */
+  /* ---------- 表紙（ロゴ＋ドリンクメニュー） ---------- */
   .cover{
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:1.4rem;text-align:center;
-    min-height:calc(100vh - 8rem);padding:1rem 1rem 2rem;
+    display:grid;grid-template-columns:minmax(0,.46fr) minmax(0,.54fr);
+    gap:2.2rem;align-items:center;
+    min-height:calc(100vh - 8rem);padding:1rem .5rem 1.5rem;
+    max-width:76rem;margin:0 auto;
   }
+  @media (max-width:900px){
+    .cover{grid-template-columns:1fr;gap:1.4rem;min-height:0}
+  }
+  .cover-left{display:flex;flex-direction:column;align-items:center;gap:1rem;text-align:center}
   .cover .logo{
-    width:min(52vh,42rem);height:min(52vh,42rem);
+    width:min(44vh,34rem);height:min(44vh,34rem);
     box-shadow:0 30px 70px -30px rgba(10,15,26,.55);
   }
-  .cover-eyebrow{font-size:.8em;letter-spacing:.34em;color:var(--gold);font-weight:700}
+  .cover-eyebrow{font-size:.78em;letter-spacing:.3em;color:var(--gold);font-weight:700}
   .cover h2{
     font-family:"Shippori Mincho B1",serif;font-weight:800;
-    font-size:2.1em;line-height:1.4;margin-top:.35rem;
+    font-size:1.65em;line-height:1.4;margin-top:.3rem;
   }
+
+  /* ---------- ドリンクメニュー ---------- */
+  .cover-right{display:grid;gap:1.05rem;align-content:center}
+  .menu-top{
+    font-family:"Oswald",sans-serif;font-size:.88em;font-weight:600;
+    letter-spacing:.3em;color:var(--gold);
+    padding-bottom:.4rem;border-bottom:1px solid var(--gold-line);
+  }
+  .menu-sec{display:grid;gap:.4rem}
+  .menu-hd{display:flex;align-items:baseline;gap:.75rem}
+  .menu-hd h3{
+    font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:1.05em;
+    letter-spacing:.06em;color:var(--ink);
+  }
+  .menu-all{
+    margin-left:auto;display:inline-flex;align-items:baseline;gap:.1rem;
+    font-family:"Oswald",sans-serif;font-weight:600;font-size:1.12em;
+    font-variant-numeric:tabular-nums;color:var(--brand);white-space:nowrap;
+  }
+  .menu-all .yen{font-size:.82em}
+  ul.menu-list{
+    list-style:none;margin:0;padding:0;
+    display:flex;flex-wrap:wrap;gap:.2rem .5rem;
+    font-size:.95em;color:var(--ink-2);line-height:1.75;
+  }
+  ul.menu-list li{white-space:nowrap}
+  /* 区切りは前の品名にくっつけておく。::before だと折り返したとき行頭に落ちる */
+  ul.menu-list li:not(:last-child)::after{
+    content:"／";color:var(--line-strong);margin-left:.45rem;
+  }
+
+  ul.menu-champ{list-style:none;margin:0;padding:0;display:grid;gap:.12rem}
+  .ch{
+    display:flex;align-items:baseline;gap:.6rem;
+    padding:.22rem 0;border-bottom:1px dotted var(--line);
+  }
+  .ch-name{font-size:.97em;color:var(--ink);overflow-wrap:anywhere}
+  .ch-price{
+    margin-left:auto;display:inline-flex;align-items:baseline;gap:.1rem;
+    font-family:"Oswald",sans-serif;font-weight:600;font-size:1.05em;
+    font-variant-numeric:tabular-nums;color:var(--brand);white-space:nowrap;
+  }
+  .ch-price .yen{font-size:.82em}
+  .ch-stock{
+    font-size:.78em;color:var(--ink-3);white-space:nowrap;
+    display:inline-flex;align-items:center;gap:.25rem;
+  }
+  .ch.soldout .ch-name{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1px}
+  .ch.soldout .ch-price{color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1px}
+  .ch-stamp{
+    font-family:"Oswald",sans-serif;font-weight:700;font-size:.7em;letter-spacing:.14em;
+    color:var(--danger);border:2px solid var(--danger);border-radius:4px;
+    padding:.06em .4em;transform:rotate(-5deg);display:inline-block;
+    white-space:nowrap;flex:0 0 auto;
+  }
+
+  input.pricein,input.stockin{
+    font-family:"Oswald",sans-serif;font-variant-numeric:tabular-nums;font-weight:600;
+    text-align:right;color:var(--ink);background:var(--surface-2);
+    border:1px solid var(--line-strong);border-radius:6px;
+    min-height:36px;padding:.1rem .35rem;font-size:1em;
+  }
+  input.pricein{width:4.6em}
+  input.stockin{width:2.6em;text-align:center;font-weight:500;font-size:.95em;min-height:32px}
+  input.pricein:focus,input.stockin:focus{outline:2px solid var(--brand);outline-offset:1px;background:var(--surface)}
+
+  /* 大画面モードではメニューを一段大きく、ゆったり見せる */
+  .app.pres .cover-right{gap:1.5rem}
+  .app.pres .menu-hd h3{font-size:1.3em}
+  .app.pres .menu-all{font-size:1.45em}
+  .app.pres ul.menu-list{font-size:1.1em;line-height:1.95}
+  .app.pres .ch{padding:.34rem 0}
+  .app.pres .ch-name{font-size:1.15em}
+  .app.pres .ch-price{font-size:1.28em}
+  .app.pres .ch-stamp{font-size:.8em}
+  .app.pres .menu-top{font-size:1em}
   .cover-noimg{
     display:grid;place-items:center;gap:.6rem;
-    width:min(52vh,42rem);aspect-ratio:1;border-radius:50%;
+    width:min(44vh,34rem);aspect-ratio:1;border-radius:50%;
     border:2px dashed var(--line-strong);color:var(--ink-3);
     font-size:.95em;line-height:1.9;padding:2rem;
   }
@@ -695,7 +776,25 @@
   var THANKS = "ツバサ　お疲れさま＆ありがとう！";
 
   /* 画面左上に出すバージョン。sw.js の CACHE の番号と必ず揃えること。 */
-  var APP_VERSION = "v8";
+  var APP_VERSION = "v9";
+
+  /* ---------- ドリンクメニュー ---------- */
+  /* 種類は固定。金額だけ変更できるようにし、シャンパンは残り本数も持つ。 */
+  var DRINK_ALC  = ["生ビール","ハイボール","緑ハイ","ウーロンハイ","ジャスハイ","レモンサワー"];
+  var DRINK_SOFT = ["緑茶","ウーロン茶","ジャスミン茶","オレンジジュース"];
+  var CHAMPAGNES = [
+    {key:"pompadour", name:"ポンパドール",                 price:6000},
+    {key:"bottega",   name:"ボッテガ　ブルースター",       price:15000},
+    {key:"veuve",     name:"ヴーヴ・クリコ　イエロー",     price:18000},
+    {key:"nectar",    name:"モエ・エ・シャンドン　ネクター", price:18000},
+    {key:"ice",       name:"モエ・エ・シャンドン　アイス",   price:18000}
+  ];
+
+  function newDrinks(){
+    var champ={};
+    CHAMPAGNES.forEach(function(c){ champ[c.key]={price:c.price, stock:null}; });
+    return {alc:500, soft:500, champ:champ};
+  }
 
   /* トランプのマーク。チーム名はこの順にニックネームを "/" で繋ぐ。
      1チーム3名のときはクローバーを使わない（カードから抜いておく運用）。 */
@@ -714,6 +813,7 @@
     phase:"setup",
     meetName:"ツバサ ありがと会",
     setup:newSetup(),
+    drinks:newDrinks(),
     teams:[], blocks:[], final:null,
     pres:false, cover:false
   };
@@ -730,6 +830,12 @@
   }
   if(!state.setup.nicks) state.setup.nicks = {};
   if(!state.setup.extras) state.setup.extras = [];
+  /* ドリンクの設定は後から足したので、無ければ既定値を入れる */
+  if(!state.drinks) state.drinks = newDrinks();
+  if(!state.drinks.champ) state.drinks.champ = newDrinks().champ;
+  CHAMPAGNES.forEach(function(c){
+    if(!state.drinks.champ[c.key]) state.drinks.champ[c.key]={price:c.price, stock:null};
+  });
   delete state.raw; delete state.seeded;
 
   /* ---------- storage ---------- */
@@ -965,6 +1071,11 @@
       if(!state.setup.extras) state.setup.extras = [];
       if(!state.setup.perTeam) state.setup.perTeam = 4;
       if(!state.setup.teamCount) state.setup.teamCount = 12;
+      if(!state.drinks) state.drinks = newDrinks();
+      if(!state.drinks.champ) state.drinks.champ = newDrinks().champ;
+      CHAMPAGNES.forEach(function(c){
+        if(!state.drinks.champ[c.key]) state.drinks.champ[c.key]={price:c.price, stock:null};
+      });
       state.pres = false; state.cover = false;
       save(); render(); window.scrollTo(0,0);
       note("読み込みました","保存されていた進行状況に切り替えました。");
@@ -1493,15 +1604,79 @@
   }
 
   /* 大会前後にロゴ画像を投影するための表紙。大画面モードと組み合わせて使う。 */
+  function yen(v){
+    if(v===null || v===undefined || v==="") return "—";
+    return "¥" + Number(v).toLocaleString("ja-JP");
+  }
+
+  /* 表紙。左にロゴ、右にドリンクメニュー。
+     編集モードでは金額と残り本数が入力欄になり、大画面モードでは表示だけになる。
+     残り0本のシャンパンは大画面で SOLD OUT を出す（本数そのものは出さない）。 */
   function renderCover(){
+    var edit = !state.pres;
+    var d = state.drinks;
+
+    function priceInput(k, v, label){
+      return '<input class="pricein" inputmode="numeric" maxlength="6"'
+        + ' data-k="d|'+k+'" aria-label="'+esc(label)+'の金額" value="'+(v==null?"":v)+'">';
+    }
+    function allRow(title, price, key){
+      return '<div class="menu-hd"><h3>'+title+'</h3>'
+        + '<span class="menu-all">ALL '
+        + (edit ? '<span class="yen">¥</span>'+priceInput(key, price, title)
+                : esc(yen(price)))
+        + '</span></div>';
+    }
+    function nameList(arr){
+      return '<ul class="menu-list">'
+        + arr.map(function(n){ return '<li>'+esc(n)+'</li>'; }).join("")
+        + '</ul>';
+    }
+
+    var champRows = CHAMPAGNES.map(function(c){
+      var st = d.champ[c.key] || {price:c.price, stock:null};
+      var out = st.stock === 0;
+      return '<li class="ch'+(out?" soldout":"")+'">'
+        + '<span class="ch-name">'+esc(c.name)+'</span>'
+        + (out && !edit ? '<span class="ch-stamp">SOLD OUT</span>' : '')
+        + '<span class="ch-price">'
+          + (edit ? '<span class="yen">¥</span>'+priceInput("p|"+c.key, st.price, c.name)
+                  : esc(yen(st.price)))
+        + '</span>'
+        + (edit
+            ? '<span class="ch-stock">残り'
+              + '<input class="stockin" inputmode="numeric" maxlength="2" data-k="d|s|'+c.key+'"'
+              + ' aria-label="'+esc(c.name)+'の残り本数" value="'+(st.stock==null?"":st.stock)+'">'
+              + '本</span>'
+            : '')
+        + '</li>';
+    }).join("");
+
     view.innerHTML =
       '<div class="cover">'
-      + '<div class="logo-slot cover-logo"><img class="logo" alt="'+esc(THANKS)+'"></div>'
-      + '<div class="cover-noimg" hidden>画像 <code>logo.jpg</code> をアプリと同じ場所に置くと、ここに表示されます。</div>'
-      + '<div><div class="cover-eyebrow">DARTS TOURNAMENT</div>'
-      + '<h2>'+esc(state.meetName || "ダーツ大会")+'</h2></div>'
+      + '<div class="cover-left">'
+        + '<div class="logo-slot cover-logo"><img class="logo" alt="'+esc(THANKS)+'"></div>'
+        + '<div class="cover-noimg" hidden>画像 <code>logo.jpg</code> をアプリと同じ場所に置くと、ここに表示されます。</div>'
+        + '<div class="cover-title"><div class="cover-eyebrow">DARTS TOURNAMENT</div>'
+        + '<h2>'+esc(state.meetName || "ダーツ大会")+'</h2></div>'
+      + '</div>'
+      + '<div class="cover-right">'
+        + '<div class="menu-top">DRINK MENU</div>'
+        + '<section class="menu-sec">'+allRow("アルコール", d.alc, "alc")+nameList(DRINK_ALC)+'</section>'
+        + '<section class="menu-sec">'+allRow("ソフトドリンク", d.soft, "soft")+nameList(DRINK_SOFT)+'</section>'
+        + '<section class="menu-sec"><div class="menu-hd"><h3>シャンパン</h3></div>'
+          + '<ul class="menu-champ">'+champRows+'</ul></section>'
+      + '</div>'
       + '</div>';
-    bar.innerHTML = "";
+
+    bar.innerHTML = edit
+      ? '<div class="actionbar"><span class="msg">金額と残り本数を入力できます。'
+        + '<b>残り0本</b>にしたシャンパンは、大画面表示で SOLD OUT になります。</span>'
+        + '<span class="right"><button class="btn gold" id="btnPres3">▣ 大画面で表示</button></span></div>'
+      : "";
+    if(edit){
+      document.getElementById("btnPres3").addEventListener("click", togglePres);
+    }
   }
 
   /* 優勝チーム名。"/" 区切りのニックネームを1行ずつに割って全員分表示する */
@@ -1670,6 +1845,27 @@
       save(); refreshSetup(); return;
     }
 
+    /* ドリンクの金額と残り本数（数字のみ） */
+    if(el.dataset.k.charAt(0)==="d"){
+      var dp=el.dataset.k.split("|");
+      var lim = dp[1]==="s" ? 2 : 6;
+      var dv = el.value.replace(/[^0-9]/g,"").slice(0,lim);
+      if(dv!==el.value) el.value=dv;
+      var num = dv==="" ? null : parseInt(dv,10);
+      if(dp[1]==="alc" || dp[1]==="soft"){
+        state.drinks[dp[1]] = num;
+      } else if(dp[1]==="p"){
+        state.drinks.champ[dp[2]].price = num;
+      } else if(dp[1]==="s"){
+        state.drinks.champ[dp[2]].stock = num;
+      }
+      save();
+      /* 入力中に作り直すとフォーカスが飛ぶので、表示だけ差し替える */
+      var row = el.closest ? el.closest(".ch") : null;
+      if(row) row.classList.toggle("soldout", num===0 && dp[1]==="s");
+      return;
+    }
+
     var raw = el.value.replace(/[^0-9]/g,"").slice(0,3);
     if(raw!==el.value) el.value=raw;
     var val = raw==="" ? null : parseInt(raw,10);
@@ -1728,8 +1924,8 @@
       body:"ニックネーム・チーム名・ブロック分け・全試合の結果をすべて消します。この操作は取り消せません。",
       ok:"すべて消す", danger:true
     }, function(){
-      state={phase:"setup", meetName:"", setup:newSetup(), teams:[], blocks:[], final:null,
-             pres:false, cover:false};
+      state={phase:"setup", meetName:"", setup:newSetup(), drinks:newDrinks(),
+             teams:[], blocks:[], final:null, pres:false, cover:false};
       save(); render(); window.scrollTo(0,0);
     });
   });
