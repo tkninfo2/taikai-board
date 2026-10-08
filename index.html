@@ -648,9 +648,11 @@
     font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:1.05em;
     letter-spacing:.06em;color:var(--ink);
   }
+  /* 金額は Oswald だと 1 と 7 が紛れるので、本文と同じゴシックで字間を広げる */
   .menu-all{
     margin-left:auto;display:inline-flex;align-items:baseline;gap:.1rem;
-    font-family:"Oswald",sans-serif;font-weight:600;font-size:1.12em;
+    font-family:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+    font-weight:700;font-size:1.08em;letter-spacing:.05em;
     font-variant-numeric:tabular-nums;color:var(--brand);white-space:nowrap;
   }
   .menu-all .yen{font-size:.82em}
@@ -673,7 +675,8 @@
   .ch-name{font-size:.97em;color:var(--ink);overflow-wrap:anywhere}
   .ch-price{
     margin-left:auto;display:inline-flex;align-items:baseline;gap:.1rem;
-    font-family:"Oswald",sans-serif;font-weight:600;font-size:1.05em;
+    font-family:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+    font-weight:700;font-size:1.02em;letter-spacing:.055em;
     font-variant-numeric:tabular-nums;color:var(--brand);white-space:nowrap;
   }
   .ch-price .yen{font-size:.82em}
@@ -685,6 +688,11 @@
   }
   .dchip:hover{background:var(--surface-2);color:var(--ink)}
   .dchip:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+  /* おすすめは淡く金色に。品切れ（.on）の方が後に来るので、そちらが優先される */
+  .dchip.rec{
+    background:var(--gold-soft);border-color:var(--gold-line);
+    color:var(--gold);font-weight:700;
+  }
   .dchip.on{
     background:var(--danger-soft);border-color:var(--danger);color:var(--danger);
     text-decoration:line-through;text-decoration-thickness:1px;
@@ -700,11 +708,26 @@
   .btn-out:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
   .btn-out.on{background:var(--danger);border-color:var(--danger);color:var(--danger-fg)}
 
+  /* おすすめの品は淡い金色の下敷きで少しだけ持ち上げる。
+     box-shadow で囲むのは、枠線だと行の高さがずれるため。 */
+  ul.menu-list li.rec .dn{
+    background:var(--gold-soft);box-shadow:0 0 0 1px var(--gold-line);
+    border-radius:6px;padding:.1em .45em;
+    color:var(--ink);font-weight:700;
+  }
+  .rec-tag{
+    font-size:.66em;font-weight:700;letter-spacing:.08em;
+    color:var(--gold);margin-left:.4em;white-space:nowrap;
+  }
+
   /* 大画面モードの品切れ表示。取り消し線は品名にだけ掛ける
-     （親に掛けるとスタンプの上まで線が走る） */
+     （親に掛けるとスタンプの上まで線が走る）。
+     品切れはおすすめより優先し、金色の下敷きも消す。 */
   ul.menu-list li.out .dn{
     color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1px;
+    background:none;box-shadow:none;font-weight:400;padding:0;
   }
+  ul.menu-list li.out .rec-tag{display:none}
   .stamp-s{
     font-family:"Oswald",sans-serif;font-weight:700;font-size:.66em;letter-spacing:.1em;
     color:var(--danger);border:1.5px solid var(--danger);border-radius:3px;
@@ -721,12 +744,13 @@
   }
 
   input.pricein{
-    font-family:"Oswald",sans-serif;font-variant-numeric:tabular-nums;font-weight:600;
+    font-family:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+    font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.05em;
     text-align:right;color:var(--ink);background:var(--surface-2);
     border:1px solid var(--line-strong);border-radius:6px;
     min-height:36px;padding:.1rem .35rem;font-size:1em;
   }
-  input.pricein{width:4.6em}
+  input.pricein{width:5.2em}
   input.pricein:focus{outline:2px solid var(--brand);outline-offset:1px;background:var(--surface)}
 
   /* 大画面モードではメニューを一段大きく、ゆったり見せる */
@@ -806,19 +830,21 @@
   var THANKS = "ツバサ　お疲れさま＆ありがとう！";
 
   /* 画面左上に出すバージョン。sw.js の CACHE の番号と必ず揃えること。 */
-  var APP_VERSION = "v10";
+  var APP_VERSION = "v11";
 
   /* ---------- ドリンクメニュー ---------- */
   /* 種類は固定。金額だけ変更できるようにし、シャンパンは残り本数も持つ。 */
-  var DRINK_ALC  = ["生ビール","ハイボール","緑ハイ","ウーロンハイ","ジャスハイ","レモンサワー"];
+  var DRINK_ALC  = ["生ビール","ハイボール","緑ハイ","ウーロンハイ","ジャスハイ","レモンサワー","ショット"];
   var DRINK_SOFT = ["緑茶","ウーロン茶","ジャスミン茶","オレンジジュース"];
   var CHAMPAGNES = [
-    {key:"pompadour", name:"ポンパドール",                 price:6000},
     {key:"bottega",   name:"ボッテガ　ブルースター",       price:15000},
     {key:"veuve",     name:"ヴーヴ・クリコ　イエロー",     price:18000},
     {key:"nectar",    name:"モエ・エ・シャンドン　ネクター", price:18000},
     {key:"ice",       name:"モエ・エ・シャンドン　アイス",   price:18000}
   ];
+
+  /* おすすめの品。品切れフラグと同じキーで指定する（ショットは a6） */
+  var RECOMMEND = {a6:true};
 
   /* 品切れは種類ごとのフラグで持つ。キーは
      アルコール a0..a5 / ソフトドリンク s0..s3 / シャンパンは c.key */
@@ -829,6 +855,19 @@
     var champ={};
     CHAMPAGNES.forEach(function(c){ champ[c.key]={price:c.price}; });
     return {alc:500, soft:500, champ:champ, out:{}};
+  }
+  /* メニューから外した品の設定が残っていると品切れ件数が狂うので捨てる */
+  function pruneDrinks(){
+    var valid={};
+    DRINK_ALC.forEach(function(_,i){ valid[alcKey(i)]=1; });
+    DRINK_SOFT.forEach(function(_,i){ valid[softKey(i)]=1; });
+    CHAMPAGNES.forEach(function(c){ valid[c.key]=1; });
+    Object.keys(state.drinks.out||{}).forEach(function(k){
+      if(!valid[k]) delete state.drinks.out[k];
+    });
+    Object.keys(state.drinks.champ||{}).forEach(function(k){
+      if(!valid[k]) delete state.drinks.champ[k];
+    });
   }
   function isOut(key){ return !!(state.drinks.out && state.drinks.out[key]); }
   function toggleOut(key){
@@ -883,6 +922,7 @@
     if(cs.stock === 0) state.drinks.out[c.key] = true;
     delete cs.stock;
   });
+  pruneDrinks();
   delete state.raw; delete state.seeded;
 
   /* ---------- storage ---------- */
@@ -1127,6 +1167,7 @@
         if(cs0.stock === 0) state.drinks.out[c.key] = true;
         delete cs0.stock;
       });
+      pruneDrinks();
       state.pres = false; state.cover = false;
       save(); render(); window.scrollTo(0,0);
       note("読み込みました","保存されていた進行状況に切り替えました。");
@@ -1683,12 +1724,15 @@
     function nameList(arr, keyFn){
       return '<ul class="menu-list">'
         + arr.map(function(n,i){
-            var k=keyFn(i), out=isOut(k);
+            var k=keyFn(i), out=isOut(k), rec=!!RECOMMEND[k];
             if(edit){
-              return '<li><button class="dchip'+(out?" on":"")+'" data-out="'+k+'"'
+              return '<li><button class="dchip'+(rec?" rec":"")+(out?" on":"")+'" data-out="'+k+'"'
                 + ' aria-pressed="'+(out?"true":"false")+'">'+esc(n)+'</button></li>';
             }
-            return '<li'+(out?' class="out"':'')+'><span class="dn">'+esc(n)+'</span>'
+            var cls=[]; if(out) cls.push("out"); if(rec) cls.push("rec");
+            return '<li'+(cls.length?' class="'+cls.join(" ")+'"':'')+'>'
+              + '<span class="dn">'+esc(n)+'</span>'
+              + (rec?'<span class="rec-tag">おすすめ</span>':'')
               + (out?'<span class="stamp-s">SOLD OUT</span>':'')+'</li>';
           }).join("")
         + '</ul>';
