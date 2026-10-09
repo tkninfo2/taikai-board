@@ -80,12 +80,12 @@ iOS の**アクセスガイド**を使うと、このアプリから抜け出せ
 
 ```js
 // sw.js
-const CACHE = "block4-board-v11";  //  ← v12, v13 … と上げる
+const CACHE = "block4-board-v12";  //  ← v13, v14 … と上げる
 ```
 
 ```js
 // index.html
-var APP_VERSION = "v11";           //  ← 同じ番号にする
+var APP_VERSION = "v12";           //  ← 同じ番号にする
 ```
 
 `sw.js` 側を上げると次回の起動時に古いキャッシュが破棄されます。`index.html` 側の番号は
@@ -136,4 +136,4 @@ var APP_VERSION = "v11";           //  ← 同じ番号にする
 - **◎ 表紙**：左にロゴ、右にドリンクメニューを出す画面。大会前後の待ち時間用。もう一度押すと元の画面に戻る
 - ドリンクの金額は表紙の編集モードで変更できる
 - 表紙の編集モードで品名をタップすると SOLD OUT のON/OFFが切り替わり、大画面表示では取り消し線と SOLD OUT のスタンプが出る（アルコール・ソフトドリンク・シャンパンすべて対応）
-- 「ショット」はおすすめ品として淡い金色でハイライトされる（`index.html` の `RECOMMEND` で指定）
+- 品名の見せ方は `index.html` の `DRINK_ALC` / `DRINK_SOFT` で指定する（`strong:true` で太字、`tone:"wine"` でワイン色）

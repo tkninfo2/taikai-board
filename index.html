@@ -41,6 +41,7 @@
     --danger:#A0161D;
     --danger-soft:#FBE2E3;
     --danger-fg:#FFFFFF;
+    --wine:#8A2A3C;
     --win-bg:#1B3A6B;
     --win-fg:#FFFFFF;
     --lose-bg:#E3E7F0;
@@ -71,6 +72,7 @@
       --danger:#F0949A;
       --danger-soft:#3B1418;
       --danger-fg:#25090C;
+      --wine:#DB94A2;
       --win-bg:#8FB4EC;
       --win-fg:#0B111C;
       --lose-bg:#212B41;
@@ -100,6 +102,7 @@
     --danger:#F0949A;
     --danger-soft:#3B1418;
     --danger-fg:#25090C;
+    --wine:#DB94A2;
     --win-bg:#8FB4EC;
     --win-fg:#0B111C;
     --lose-bg:#212B41;
@@ -688,11 +691,10 @@
   }
   .dchip:hover{background:var(--surface-2);color:var(--ink)}
   .dchip:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
-  /* おすすめは淡く金色に。品切れ（.on）の方が後に来るので、そちらが優先される */
-  .dchip.rec{
-    background:var(--gold-soft);border-color:var(--gold-line);
-    color:var(--gold);font-weight:700;
-  }
+  /* 強調する品は太字、ワイン色の品は文字色だけ変える。
+     品切れ（.on）の方が後に来るので、そちらが優先される */
+  .dchip.strong{font-weight:700;color:var(--ink)}
+  .dchip.wine{color:var(--wine)}
   .dchip.on{
     background:var(--danger-soft);border-color:var(--danger);color:var(--danger);
     text-decoration:line-through;text-decoration-thickness:1px;
@@ -708,26 +710,17 @@
   .btn-out:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
   .btn-out.on{background:var(--danger);border-color:var(--danger);color:var(--danger-fg)}
 
-  /* おすすめの品は淡い金色の下敷きで少しだけ持ち上げる。
-     box-shadow で囲むのは、枠線だと行の高さがずれるため。 */
-  ul.menu-list li.rec .dn{
-    background:var(--gold-soft);box-shadow:0 0 0 1px var(--gold-line);
-    border-radius:6px;padding:.1em .45em;
-    color:var(--ink);font-weight:700;
-  }
-  .rec-tag{
-    font-size:.66em;font-weight:700;letter-spacing:.08em;
-    color:var(--gold);margin-left:.4em;white-space:nowrap;
-  }
+  /* 強調する品は太字にするだけ。囲みや下敷きは付けない */
+  ul.menu-list li.strong .dn{font-weight:700;color:var(--ink)}
+  ul.menu-list li.wine .dn{color:var(--wine)}
 
   /* 大画面モードの品切れ表示。取り消し線は品名にだけ掛ける
      （親に掛けるとスタンプの上まで線が走る）。
-     品切れはおすすめより優先し、金色の下敷きも消す。 */
+     品切れは太字やワイン色より優先する。 */
   ul.menu-list li.out .dn{
     color:var(--ink-3);text-decoration:line-through;text-decoration-thickness:1px;
-    background:none;box-shadow:none;font-weight:400;padding:0;
+    font-weight:400;
   }
-  ul.menu-list li.out .rec-tag{display:none}
   .stamp-s{
     font-family:"Oswald",sans-serif;font-weight:700;font-size:.66em;letter-spacing:.1em;
     color:var(--danger);border:1.5px solid var(--danger);border-radius:3px;
@@ -830,12 +823,36 @@
   var THANKS = "ツバサ　お疲れさま＆ありがとう！";
 
   /* 画面左上に出すバージョン。sw.js の CACHE の番号と必ず揃えること。 */
-  var APP_VERSION = "v11";
+  var APP_VERSION = "v12";
 
   /* ---------- ドリンクメニュー ---------- */
   /* 種類は固定。金額だけ変更できるようにし、シャンパンは残り本数も持つ。 */
-  var DRINK_ALC  = ["生ビール","ハイボール","緑ハイ","ウーロンハイ","ジャスハイ","レモンサワー","ショット"];
-  var DRINK_SOFT = ["緑茶","ウーロン茶","ジャスミン茶","オレンジジュース"];
+  /* key は品切れフラグの保存に使う。並び順を変えても設定が別の品に移らないよう、
+     番号ではなく品目ごとの固定キーにしている。
+     strong:太字 / tone:"wine":ワイン色 */
+  var DRINK_ALC = [
+    {key:"beer",     name:"生ビール"},
+    {key:"highball", name:"ハイボール"},
+    {key:"green",    name:"緑ハイ"},
+    {key:"oolong",   name:"ウーロンハイ"},
+    {key:"jasmine",  name:"ジャスハイ"},
+    {key:"lemon",    name:"レモンサワー"},
+    {key:"anejo",    name:"アネホ（売切れ御免）", tone:"wine"},
+    {key:"shot",     name:"ショット！", strong:true}
+  ];
+  var DRINK_SOFT = [
+    {key:"tgreen",   name:"緑茶"},
+    {key:"toolong",  name:"ウーロン茶"},
+    {key:"tjasmine", name:"ジャスミン茶"},
+    {key:"orange",   name:"オレンジジュース"}
+  ];
+
+  /* v11 以前は a0.. / s0.. の連番キーだったので、固定キーへ読み替える */
+  var LEGACY_DRINK_KEYS = {
+    a0:"beer", a1:"highball", a2:"green", a3:"oolong",
+    a4:"jasmine", a5:"lemon", a6:"shot",
+    s0:"tgreen", s1:"toolong", s2:"tjasmine", s3:"orange"
+  };
   var CHAMPAGNES = [
     {key:"bottega",   name:"ボッテガ　ブルースター",       price:15000},
     {key:"veuve",     name:"ヴーヴ・クリコ　イエロー",     price:18000},
@@ -843,28 +860,26 @@
     {key:"ice",       name:"モエ・エ・シャンドン　アイス",   price:18000}
   ];
 
-  /* おすすめの品。品切れフラグと同じキーで指定する（ショットは a6） */
-  var RECOMMEND = {a6:true};
 
   /* 品切れは種類ごとのフラグで持つ。キーは
      アルコール a0..a5 / ソフトドリンク s0..s3 / シャンパンは c.key */
-  function alcKey(i){ return "a"+i; }
-  function softKey(i){ return "s"+i; }
-
   function newDrinks(){
     var champ={};
     CHAMPAGNES.forEach(function(c){ champ[c.key]={price:c.price}; });
     return {alc:500, soft:500, champ:champ, out:{}};
   }
-  /* メニューから外した品の設定が残っていると品切れ件数が狂うので捨てる */
+  /* 旧い連番キーを固定キーに移し、メニューから外した品の設定は捨てる
+     （残っていると「現在○品が SOLD OUT」の件数が狂う） */
   function pruneDrinks(){
-    var valid={};
-    DRINK_ALC.forEach(function(_,i){ valid[alcKey(i)]=1; });
-    DRINK_SOFT.forEach(function(_,i){ valid[softKey(i)]=1; });
-    CHAMPAGNES.forEach(function(c){ valid[c.key]=1; });
-    Object.keys(state.drinks.out||{}).forEach(function(k){
-      if(!valid[k]) delete state.drinks.out[k];
+    var out = state.drinks.out || (state.drinks.out = {});
+    Object.keys(LEGACY_DRINK_KEYS).forEach(function(old){
+      if(out[old]){ out[LEGACY_DRINK_KEYS[old]] = true; delete out[old]; }
     });
+    var valid={};
+    DRINK_ALC.forEach(function(x){ valid[x.key]=1; });
+    DRINK_SOFT.forEach(function(x){ valid[x.key]=1; });
+    CHAMPAGNES.forEach(function(c){ valid[c.key]=1; });
+    Object.keys(out).forEach(function(k){ if(!valid[k]) delete out[k]; });
     Object.keys(state.drinks.champ||{}).forEach(function(k){
       if(!valid[k]) delete state.drinks.champ[k];
     });
@@ -924,6 +939,7 @@
   });
   pruneDrinks();
   delete state.raw; delete state.seeded;
+  save();   /* 読み替えた結果を書き戻して、古いキーを残さない */
 
   /* ---------- storage ---------- */
   function save(){
@@ -1721,18 +1737,20 @@
     }
     /* 品名の一覧。編集モードはタップで品切れを切り替えるボタン、
        大画面モードは取り消し線と SOLD OUT の表示だけ。 */
-    function nameList(arr, keyFn){
+    function nameList(arr){
       return '<ul class="menu-list">'
-        + arr.map(function(n,i){
-            var k=keyFn(i), out=isOut(k), rec=!!RECOMMEND[k];
+        + arr.map(function(it){
+            var out=isOut(it.key), cls=[];
+            if(out) cls.push("out");
+            if(it.strong) cls.push("strong");
+            if(it.tone==="wine") cls.push("wine");
             if(edit){
-              return '<li><button class="dchip'+(rec?" rec":"")+(out?" on":"")+'" data-out="'+k+'"'
-                + ' aria-pressed="'+(out?"true":"false")+'">'+esc(n)+'</button></li>';
+              return '<li><button class="dchip'+(cls.length?" "+cls.join(" "):"")
+                + (out?" on":"")+'" data-out="'+it.key+'"'
+                + ' aria-pressed="'+(out?"true":"false")+'">'+esc(it.name)+'</button></li>';
             }
-            var cls=[]; if(out) cls.push("out"); if(rec) cls.push("rec");
             return '<li'+(cls.length?' class="'+cls.join(" ")+'"':'')+'>'
-              + '<span class="dn">'+esc(n)+'</span>'
-              + (rec?'<span class="rec-tag">おすすめ</span>':'')
+              + '<span class="dn">'+esc(it.name)+'</span>'
               + (out?'<span class="stamp-s">SOLD OUT</span>':'')+'</li>';
           }).join("")
         + '</ul>';
@@ -1765,8 +1783,8 @@
       + '</div>'
       + '<div class="cover-right">'
         + '<div class="menu-top">DRINK MENU</div>'
-        + '<section class="menu-sec">'+allRow("アルコール", d.alc, "alc")+nameList(DRINK_ALC, alcKey)+'</section>'
-        + '<section class="menu-sec">'+allRow("ソフトドリンク", d.soft, "soft")+nameList(DRINK_SOFT, softKey)+'</section>'
+        + '<section class="menu-sec">'+allRow("アルコール", d.alc, "alc")+nameList(DRINK_ALC)+'</section>'
+        + '<section class="menu-sec">'+allRow("ソフトドリンク", d.soft, "soft")+nameList(DRINK_SOFT)+'</section>'
         + '<section class="menu-sec"><div class="menu-hd"><h3>シャンパン</h3></div>'
           + '<ul class="menu-champ">'+champRows+'</ul></section>'
       + '</div>'
